@@ -1,30 +1,39 @@
+import {
+  Nullable
+} from './nullable';
+
 type PQueue<T> = {
   payload: T,
-  priority?: number, // theoretically anything Ord will do
-  left?: PQueue<T>,
-  right?: PQueue<T>
-}
+  priority: number,
+  left: Nullable<PQueue<T>>,
+  right: Nullable<PQueue<T>>
+};
 
-export function first<T>(p: PQueue<T>): T {
-  return p.payload;
+export function first<T>(p: Nullable<PQueue<T>>): Nullable<T> {
+  return isPresent(p) ? p.payload : null;
 }
-export function pop<T>(p: PQueue<T>): PQueue<T> | void {
+export function pop<T>(p: PQueue<T>): Nullable<PQueue<T>> {
   return merge(p.left, p.right)
 }
 export function push<T>(p: PQueue<T>, priority: number, payload: T): PQueue<T> {
   const newQueue = create(payload, priority);
-  return merge(p, newQueue);
+  const nextQueue = merge(p, newQueue);
+  if (isPresent(nextQueue)) {
+    return nextQueue
+  } else {
+    throw new Error('Unexpected null queue after adding')
+  }
 }
-export function create<T>(payload: T, priority: number = 0): PQueue<T> {
-  return { payload, priority }
+export function create<T>(payload: T, priority: number = Infinity): PQueue<T> {
+  return { payload, priority, left: null, right: null }
 }
-export function isBlank<T>(x?: PQueue<T>): x is PQueue<T> {
+export function isBlank<T>(x: Nullable<PQueue<T>>): x is PQueue<T> {
   return x === null || x === undefined;
 }
-export function isPresent<T>(x?: PQueue<T>): x is PQueue<T> {
+export function isPresent<T>(x: Nullable<PQueue<T>>): x is PQueue<T> {
   return !isBlank(x);
 }
-export function merge<T>(qLeft?: PQueue<T>, qRight?: PQueue<T>): PQueue<T> {
+export function merge<T>(qLeft: Nullable<PQueue<T>>, qRight: Nullable<PQueue<T>>): Nullable<PQueue<T>> {
   if (isBlank(qLeft) && isPresent(qRight)) {
     return qRight;
   } else if (isBlank(qRight) && isPresent(qLeft)) {
@@ -46,9 +55,9 @@ export function merge<T>(qLeft?: PQueue<T>, qRight?: PQueue<T>): PQueue<T> {
   } else if (isPresent(qLeft) && isPresent(qRight) && priority(qLeft) < priority(qRight)) {
     return merge(qRight, qLeft)
   } else {
-    throw new Error("YOU SHOULD NOT MERGE TWO EMPTY QUEUES")
+    return null;
   }
 }
-export function priority<T>(q?: PQueue<T>): number {
-  return (isPresent(q) && q.priority != null) ? q.priority : Infinity
+export function priority<T>(q: Nullable<PQueue<T>>): number {
+  return isPresent(q) ? q.priority : Infinity
 }
