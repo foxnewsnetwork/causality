@@ -1,5 +1,5 @@
 import {
-  Nullable, mbind, fmap
+  Nullable, mbind, fmap, LiftA1
 } from './nullable';
 
 export type PQueue<T> = {
@@ -12,12 +12,12 @@ export type PQueue<T> = {
 function _first<T>(p: PQueue<T>): Nullable<T> {
   return p.payload;
 }
-export const first: typeof _first = fmap(_first)
+export const first: LiftA1<typeof _first> = fmap(_first)
 
 function _pop<T>(p: PQueue<T>): Nullable<PQueue<T>> {
   return merge(p.left, p.right)
 }
-export const pop: typeof _pop = mbind(_pop)
+export const pop: LiftA1<typeof _pop> = mbind(_pop)
 
 export function push<T>(p: PQueue<T>, priority: number, payload: T): PQueue<T> {
   const newQueue = create(payload, priority);
