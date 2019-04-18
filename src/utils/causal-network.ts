@@ -32,18 +32,18 @@ import {
  * @param effect 
  */
 export function dSeparated<V>(g: Graph<V>, ctrlVars: Set<V>, cause: V, effect: V): boolean {
-  const visitableMap: Map<V, Set<VisitRecord<V>>> = new Map()
-  let changeFlag = true;
-  
-  while(changeFlag) {
-    for(const me of getNodes(g)) {
-      const myVisitables = visitableMap.get(me)
+  const map = visitableGraph(g, ctrlVars);
 
-      for (const neighbor of getNeighbors(g, me)) {
-        
-      }
-    }
+  const effects = map.get(cause)
+  if (effects != null) {
+    return effects.has(effect)
+  } else {
+    throw new Error(`Node '${cause}' not in the graph`)
   }
+}
+
+export function visitableGraph<V>(g: Graph<V>, ctrlVars: Set<V>): GraphVisitableMap<V> {
+
 }
 
 enum Direction {
@@ -51,4 +51,5 @@ enum Direction {
   Anticausal
 }
 
-type VisitRecord<V> = [Direction, V]
+type GraphVisitableMap<V> = Map<V, Set<V>>
+// type VisitRecord<V> = [Direction, V]
