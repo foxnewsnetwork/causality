@@ -1,6 +1,6 @@
-type Fn2<A, B> = (a: A, b: B) => A;
+import { Fn2 } from './types';
 
-export function reduce<T, X>(iter: Iterable<T>, reduceFn: Fn2<X, T>, init: X): X {
+export function reduce<T, X>(iter: Iterable<T>, reduceFn: Fn2<X, T, X>, init: X): X {
   for (const t of iter) {
     init = reduceFn(init, t)
   }

@@ -15,7 +15,7 @@ export function addChild<P>(g: Graph<P>, start: P, finish: P): Graph<P> {
 export function getNeighbors<P>(g: Graph<P>, me: P): Set<P> {
   const children = getChildren(g, me)
   const parents = getParents(g, me)
-  
+
   return new Set(concat(parents, children))
 }
 

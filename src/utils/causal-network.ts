@@ -43,7 +43,15 @@ export function dSeparated<V>(g: Graph<V>, ctrlVars: Set<V>, cause: V, effect: V
 }
 
 export function visitableGraph<V>(g: Graph<V>, ctrlVars: Set<V>): GraphVisitableMap<V> {
-
+  let hasSettled = true
+  for (const me of g) {
+    const receivedMsgs = messagesForNode(me)
+    const nextMe = updateNode(me, receivedMsgs)
+    if (hasChanged(nextMe, me)) {
+      hasSettled = false
+    }
+    sendMessages(messagesToNeighbors(nextMe))
+  }
 }
 
 enum Direction {
@@ -51,5 +59,5 @@ enum Direction {
   Anticausal
 }
 
+type VisitRecord<V> = [Direction, V]
 type GraphVisitableMap<V> = Map<V, Set<V>>
-// type VisitRecord<V> = [Direction, V]
