@@ -1,11 +1,15 @@
 import {
   Graph,
   getNodes,
-  getNeighbors
+  getNeighbors,
+  getParents
 } from './graph';
 import {
-  over
+  over, getWithDefault
 } from './map';
+import {
+  create, MailServer, getMail, spamMail, spamBulkMail
+} from './mail-server';
 
 /**
  * Is there a path between two points on a graph given a set of
@@ -42,20 +46,62 @@ export function dSeparated<V>(g: Graph<V>, ctrlVars: Set<V>, cause: V, effect: V
   }
 }
 
-export function visitableGraph<V>(g: Graph<V>, ctrlVars: Set<V>): GraphVisitableMap<V> {
-  const server = new MailServer();
+type Postcard<V> = {
+  direction: Direction,
+  landmark: V
+}
+
+export function visitableGraph<V>(g: Graph<V>, quaratine: Set<V>): GraphVisitableMap<V> {
+  let server: MailServer<V, Postcard<V>> = create()
+  let visitableMap: GraphVisitableMap<V> = new Map()
+
   let notSettled = true;
   while (notSettled) {
     notSettled = false;
-    for (const [me] of g) {
-      const receivedMsgs = server.getMessages(me)
-      const nextMe = updateNode(me, receivedMsgs)
-      if (hasChanged(nextMe, me)) {
-        notSettled = true
+    for (const [me, children] of g) {
+      const parents = getParents(g, me)
+      const receivedMail = getMail(server, me)
+      const visitedLandmarks = getWithDefault(visitableMap, me, () => new Set())
+
+      for (const postcard of receivedMail) {
+        if (visitedLandmarks.has(postcard.landmark)) {
+          continue;
+        } else {
+          notSettled = true
+          visitableMap = over(
+            visitableMap,
+            me,
+            (landmarks = new Set()) => landmarks.add(postcard.landmark)
+          )
+        }
       }
-      sendMessages(messagesToNeighbors(nextMe))
+
+      // Spam children about me unless I'm under quarantine
+      if (!quaratine.has(me)) {
+        server = spamMail(server, children, {
+          direction: Direction.Causal,
+          landmark: me
+        })
+      }
+      // Spam parents about me unless I'm under quarantine
+      if (!quaratine.has(me)) {
+        server = spamMail(server, parents, {
+          direction: Direction.Anticausal,
+          landmark: me
+        })
+      }
+      // Forward my parents mail to children unless I'm under quarantine
+      if (!quaratine.has(me)) {
+        server = spamBulkMail(server, children, parentsMail)
+      }
+      // Forward my children's mail to parents
+      // Forward my children's mail to my other children
+      // Forward my parents' mail to my other parents if I'm under quarantine
+      // Forward my parents' mail to my other parents if any of my children are under quarantine
     }
   }
+
+  return visitableMap
 }
 
 enum Direction {
