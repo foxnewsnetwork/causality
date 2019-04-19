@@ -43,14 +43,18 @@ export function dSeparated<V>(g: Graph<V>, ctrlVars: Set<V>, cause: V, effect: V
 }
 
 export function visitableGraph<V>(g: Graph<V>, ctrlVars: Set<V>): GraphVisitableMap<V> {
-  let hasSettled = true
-  for (const me of g) {
-    const receivedMsgs = messagesForNode(me)
-    const nextMe = updateNode(me, receivedMsgs)
-    if (hasChanged(nextMe, me)) {
-      hasSettled = false
+  const server = new MailServer();
+  let notSettled = true;
+  while (notSettled) {
+    notSettled = false;
+    for (const [me] of g) {
+      const receivedMsgs = server.getMessages(me)
+      const nextMe = updateNode(me, receivedMsgs)
+      if (hasChanged(nextMe, me)) {
+        notSettled = true
+      }
+      sendMessages(messagesToNeighbors(nextMe))
     }
-    sendMessages(messagesToNeighbors(nextMe))
   }
 }
 
