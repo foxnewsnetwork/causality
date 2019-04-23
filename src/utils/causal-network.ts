@@ -10,6 +10,7 @@ import {
 import {
   create, MailServer, getMail, spamMail, spamBulkMail
 } from './mail-server';
+import { filter, any } from './iter';
 
 /**
  * Is there a path between two points on a graph given a set of
@@ -48,7 +49,7 @@ export function dSeparated<V>(g: Graph<V>, ctrlVars: Set<V>, cause: V, effect: V
 
 type Postcard<V> = {
   direction: Direction,
-  landmark: V
+  sender: V
 }
 
 export function visitableGraph<V>(g: Graph<V>, quaratine: Set<V>): GraphVisitableMap<V> {
@@ -61,17 +62,17 @@ export function visitableGraph<V>(g: Graph<V>, quaratine: Set<V>): GraphVisitabl
     for (const [me, children] of g) {
       const parents = getParents(g, me)
       const receivedMail = getMail(server, me)
-      const visitedLandmarks = getWithDefault(visitableMap, me, () => new Set())
+      const visitedSenders = getWithDefault(visitableMap, me, () => new Set())
 
       for (const postcard of receivedMail) {
-        if (visitedLandmarks.has(postcard.landmark)) {
+        if (visitedSenders.has(postcard.sender)) {
           continue;
         } else {
           notSettled = true
           visitableMap = over(
             visitableMap,
             me,
-            (landmarks = new Set()) => landmarks.add(postcard.landmark)
+            (senders = new Set()) => senders.add(postcard.sender)
           )
         }
       }
@@ -80,24 +81,40 @@ export function visitableGraph<V>(g: Graph<V>, quaratine: Set<V>): GraphVisitabl
       if (!quaratine.has(me)) {
         server = spamMail(server, children, {
           direction: Direction.Causal,
-          landmark: me
+          sender: me
         })
       }
       // Spam parents about me unless I'm under quarantine
       if (!quaratine.has(me)) {
         server = spamMail(server, parents, {
           direction: Direction.Anticausal,
-          landmark: me
+          sender: me
         })
       }
       // Forward my parents mail to children unless I'm under quarantine
+      // chain rule
       if (!quaratine.has(me)) {
+        const parentsMail = filter(receivedMail, mail => parents.has(mail.sender))
         server = spamBulkMail(server, children, parentsMail)
       }
-      // Forward my children's mail to parents
-      // Forward my children's mail to my other children
-      // Forward my parents' mail to my other parents if I'm under quarantine
-      // Forward my parents' mail to my other parents if any of my children are under quarantine
+      // Forward my children's mail to parents unless I'm under quarantine
+      // chain rule (going backwards)
+      if (!quaratine.has(me)) {
+        const childrensMail = filter(receivedMail, mail => children.has(mail.sender))
+        server = spamBulkMail(server, parents, childrensMail)
+      }
+      // Forward my children's mail to my other children unless I'm under quarantine
+      // fork rule
+      if (!quaratine.has(me)) {
+        const childrensMail = filter(receivedMail, mail => children.has(mail.sender))
+        server = spamBulkMail(server, children, childrensMail)
+      }
+      // Forward my parents' mail to my other parents if I or any of my children are under quarantine
+      // collider rule
+      if (quaratine.has(me) || any(children, child => quaratine.has(child))) {
+        const parentsMail = filter(receivedMail, mail => parents.has(mail.sender))
+        server = spamBulkMail(server, parents, parentsMail)
+      }
     }
   }
 

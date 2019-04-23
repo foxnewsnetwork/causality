@@ -29,3 +29,16 @@ export function* concat<T>(itA: Iterable<T>, itB: Iterable<T>): Iterable<T> {
     yield b;
   }
 }
+
+export function any<T>(it: Iterable<T>, checkFn: (t: T) => boolean): boolean {
+  for (const t of it) {
+    if (checkFn(t)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+export function all<T>(it: Iterable<T>, isStillTrue: (t: T) => boolean): boolean {
+  return reduce(it, (wasTrue: boolean, t) => wasTrue && isStillTrue(t), true)
+}
