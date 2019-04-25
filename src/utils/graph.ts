@@ -3,6 +3,13 @@ import { filter, map, concat } from './iter';
 
 export type Graph<P> = Map<P, Set<P>>;
 
+export function create<P>(name: P): Graph<P> {
+  const children: Set<P> = new Set()
+  const map: Graph<P> = new Map()
+  map.set(name, children)
+  return map
+}
+
 export function addChild<P>(g: Graph<P>, start: P, finish: P): Graph<P> {
   return over(g, start, (children = new Set()) => {
     if (!children.has(finish)) {
