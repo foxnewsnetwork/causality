@@ -1,5 +1,5 @@
 import { getWithDefault, over } from './map';
-import { filter, map, concat } from './iter';
+import { filter, map, concat, reduce } from './iter';
 
 export type Graph<P> = Map<P, Set<P>>;
 
@@ -30,11 +30,27 @@ export function getChildren<P>(g: Graph<P>, parent: P): Set<P> {
   return getWithDefault(g, parent, () => new Set());
 }
 
-export function getParents<P>(g: Graph<P>, child: P): Set<P> {
+export function getDescendants<P>(g: Graph<P>, parent: P): Set<P> {
+  const children = getChildren(g, parent);
+  if (children.size === 0) {
+    return new Set([ parent ])
+  } else {
+    return reduce(
+      children, 
+      (descs, child) => new Set(concat(descs, getDescendants(g, child))), 
+      new Set([ parent ])
+    )
+  }
+}
+
+function _getParents<P>(g: Graph<P>, child: P): Set<P> {
   const _parents = filter(g, ([_, children]) => children.has(child))
   const _parentNames = map(_parents, ([key]) => key)
   return new Set(_parentNames)
 }
+
+const [cachedGetParents, bustCache] = cache(_getParents);
+export const getParents = cachedGetParents;
 
 export function getNodes<P>(g: Graph<P>): Set<P> {
   return new Set(g.keys())

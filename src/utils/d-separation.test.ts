@@ -1,6 +1,6 @@
 import {
   visitableGraph
-} from './causal-network'
+} from './d-separation'
 import {
   create,
   Graph,

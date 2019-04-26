@@ -18,4 +18,13 @@ graph TD
 
 ## Testing d-Separation
 
-- Given OVEREATING, I would like to test that BEING_FAT is d-separated from UPSET_STOMACH
+I'd like to test the following d-separation conditions
+
+- X --> A <-- Y 
+  - X and Y are blocked IFF A and all its descendants are not controlled
+- X --> A --> Y
+  - X and Y are blocked if A is controlled
+- X <-- A --> Y
+  - X and Y are blocked if A is controlled
+- X <-- A <-- Y
+  - X and Y are blocked if A is controlled

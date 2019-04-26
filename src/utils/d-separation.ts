@@ -1,7 +1,5 @@
 import {
   Graph,
-  getNodes,
-  getNeighbors,
   getParents
 } from './graph';
 import {
