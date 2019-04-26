@@ -36,6 +36,56 @@ describe('utils/causal-network.ts', () => {
       const quarantine = new Set([LIFE_EVENT.OVEREATING])
       const resMap = visitableGraph(graph, quarantine)
 
+      describe(`at node ${LIFE_EVENT.EXERCISING}`, () => {
+        const visitable = resMap.get(LIFE_EVENT.EXERCISING) || new Set()
+
+        it(`should cause ${LIFE_EVENT.BEING_FAT}`, () => {
+          expect(visitable.has(LIFE_EVENT.BEING_FAT)).toBeTruthy()
+        })
+
+        describe(`collider with ${LIFE_EVENT.BEING_FAT}`, () => {
+          it('should be be independent from the other nodes', () => {
+            expect(visitable.size).toEqual(1)
+          })
+        })
+      })
+
+      describe(`at node ${LIFE_EVENT.POVERTY}`, () => {
+        const visitable = resMap.get(LIFE_EVENT.POVERTY) || new Set()
+
+        it(`should now be correlated to ${LIFE_EVENT.AWFUL_BOSS}`, () => {
+          expect(visitable.has(LIFE_EVENT.AWFUL_BOSS)).toBeTruthy()
+        })
+      })
+
+      describe(`at node ${LIFE_EVENT.AWFUL_BOSS}`, () => {
+        const visitable = resMap.get(LIFE_EVENT.AWFUL_BOSS) || new Set()
+
+        it(`should now be correlated to ${LIFE_EVENT.POVERTY}`, () => {
+          expect(visitable.has(LIFE_EVENT.POVERTY)).toBeTruthy()
+        })
+      })
+
+      describe(`at node ${LIFE_EVENT.UPSET_STOMACH}`, () => {
+        const visitable = resMap.get(LIFE_EVENT.UPSET_STOMACH) || new Set()
+
+        it('should not be visitable by anything', () => {
+          expect(visitable.size).toEqual(0)
+        })
+      })
+
+      describe(`at node ${LIFE_EVENT.FAT_GENE}`, () => {
+        const visitable = resMap.get(LIFE_EVENT.FAT_GENE) || new Set()
+        
+        it(`should still be a cause of ${LIFE_EVENT.BEING_FAT} despite controlling for ${LIFE_EVENT.OVEREATING}`, () => {
+          expect(visitable.has(LIFE_EVENT.BEING_FAT)).toBeTruthy()
+        })
+
+        it(`should cause ${LIFE_EVENT.BEING_FAT} through the mediating variable of ${LIFE_EVENT.LOW_METABOLISM}`, () => {
+          expect(visitable.has(LIFE_EVENT.LOW_METABOLISM)).toBeTruthy()
+        })
+      })
+
       describe(`at node ${LIFE_EVENT.BEING_FAT}`, () => {
         const visitables = resMap.get(LIFE_EVENT.BEING_FAT) || new Set()
         const DEPENDENCIES = new Set([
