@@ -9,6 +9,15 @@ export function getWithDefault<K, V>(map: Map<K, V>, key: K, defValFn: () => V):
   }
 }
 
+export function getOrDie<K, V>(map: Map<K, V>, key: K): V {
+  if (map.has(key)) {
+    const possibleResult = map.get(key) as V;
+    return possibleResult
+  } else {
+    throw new Error('Map does not have expected key')
+  }
+}
+
 export function over<K, V>(map: Map<K, V>, key: K, mapFn: (v?: V) => V): Map<K, V> {
   let nextVal;
   if (map.has(key)) {

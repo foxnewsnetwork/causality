@@ -1,6 +1,8 @@
 import {
   Graph,
-  getParents
+  getParents,
+  getChildren,
+  getNodes
 } from './graph';
 import {
   over, getWithDefault
@@ -8,7 +10,7 @@ import {
 import {
   create, MailServer, getMail, spamMail, spamBulkMail
 } from './mail-server';
-import { filter, any } from './iter';
+import { filter, any, has } from './iter';
 
 /**
  * Is there a path between two points on a graph given a set of
@@ -57,7 +59,8 @@ export function visitableGraph<V>(g: Graph<V>, quaratine: Set<V>): GraphVisitabl
   let notSettled = true;
   while (notSettled) {
     notSettled = false;
-    for (const [me, children] of g) {
+    for (const me of getNodes(g)) {
+      const children = getChildren(g, me)
       const parents = getParents(g, me)
       const receivedMail = getMail(server, me)
       const visitedSenders = getWithDefault(visitableMap, me, () => new Set())
@@ -92,25 +95,25 @@ export function visitableGraph<V>(g: Graph<V>, quaratine: Set<V>): GraphVisitabl
       // Forward my parents mail to children unless I'm under quarantine
       // chain rule
       if (!quaratine.has(me)) {
-        const parentsMail = filter(receivedMail, mail => parents.has(mail.sender))
+        const parentsMail = filter(receivedMail, mail => has(parents, mail.sender))
         server = spamBulkMail(server, children, parentsMail)
       }
       // Forward my children's mail to parents unless I'm under quarantine
       // chain rule (going backwards)
       if (!quaratine.has(me)) {
-        const childrensMail = filter(receivedMail, mail => children.has(mail.sender))
+        const childrensMail = filter(receivedMail, mail => has(children, mail.sender))
         server = spamBulkMail(server, parents, childrensMail)
       }
       // Forward my children's mail to my other children unless I'm under quarantine
       // fork rule
       if (!quaratine.has(me)) {
-        const childrensMail = filter(receivedMail, mail => children.has(mail.sender))
+        const childrensMail = filter(receivedMail, mail => has(children, mail.sender))
         server = spamBulkMail(server, children, childrensMail)
       }
       // Forward my parents' mail to my other parents if I or any of my children are under quarantine
       // collider rule
-      if (quaratine.has(me) || any(children, child => quaratine.has(child))) {
-        const parentsMail = filter(receivedMail, mail => parents.has(mail.sender))
+      if (quaratine.has(me) || any(children, child => has(quaratine, child))) {
+        const parentsMail = filter(receivedMail, mail => has(parents, mail.sender))
         server = spamBulkMail(server, parents, parentsMail)
       }
     }
