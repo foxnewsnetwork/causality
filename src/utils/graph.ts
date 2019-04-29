@@ -1,81 +1,84 @@
 import { getWithDefault, over } from './map';
-import { filter, map, concat, reduce, has, push, ZERO, isEmpty, lift0 } from './iter';
-import { cache2 } from './func';
 import { guid } from './misc';
+import { filter as iFilter, map as iMap } from './iter';
+import { empty, isMember, add, union, isEmpty, lift0, map, flatMap } from './set';
+import { cache2 } from './func';
 
 export type Graph<P> = {
   id: string,
-  parent2child: Map<P, Iterable<P>>
+  parent2children: Map<P, Set<P>>
 };
 
 type BustCacheFn = <P>(g: Graph<P>, name: P) => void;
 
+
+// Currently not working
+type GetParents = typeof _getParents
+function _hashParents<P>(g: Graph<P>, child: P): string {
+  return `${g.id}--${child}`
+}
 const cached = cache2(_getParents, _hashParents);
 export const getParents: GetParents = cached.cachedFn;
 const bustCache: BustCacheFn = cached.bustFn
 
-export function create<P>(name: P): Graph<P> {
+export function create<P>(): Graph<P> {
   const id = guid()
-  const parent2child: Map<P, Iterable<P>> = over(new Map(), name, () => ZERO)
+  const parent2children: Map<P, Set<P>> = new Map()
 
-  return { id, parent2child }
+  const me = {
+    id,
+    parent2children
+  }
+  return me;
 }
 
-export function addChild<P>(g: Graph<P>, start: P, finish: P): Graph<P> {
-  const parent2child = over(g.parent2child, start, (children = ZERO) => {
-    if (!has(children, finish)) {
-      bustCache(g, finish)
-      return push(children, finish)
+export function addChild<P>(g: Graph<P>, parent: P, child: P): Graph<P> {
+  const _parent2children = over(g.parent2children, parent, (children = empty()) => {
+    if (!isMember(children, child)) {
+      bustCache(g, parent)
+      return add(children, child)
     } else {
-      return children;
+      return children
     }
   })
+  bustCache(g, child)
+  const parent2children = over(_parent2children, child, (grandchildren = empty()) => grandchildren)
   return {
     ...g,
-    parent2child
+    parent2children
   }
 }
 
-export function getNeighbors<P>(g: Graph<P>, me: P): Iterable<P> {
+export function getNeighbors<P>(g: Graph<P>, me: P): Set<P> {
   const children = getChildren(g, me)
   const parents = getParents(g, me)
 
-  return concat(parents, children)
+  return union(parents, children)
 }
 
-export function getChildren<P>(g: Graph<P>, parent: P): Iterable<P> {
-  return getWithDefault(g.parent2child, parent, () => ZERO);
+export function getChildren<P>(g: Graph<P>, parent: P): Set<P> {
+  return getWithDefault(g.parent2children, parent, empty);
 }
 
-export function getDescendants<P>(g: Graph<P>, parent: P): Iterable<P> {
+export function getDescendants<P>(g: Graph<P>, parent: P): Set<P> {
   const children = getChildren(g, parent);
   if (isEmpty(children)) {
     return lift0(parent)
   } else {
-    return reduce(
-      children,
-      (descs, child) => concat(descs, getDescendants(g, child)),
-      lift0(parent)
-    )
+    return flatMap(children, child => getDescendants(g, child))
   }
 }
 
-function _getParents<P>(g: Graph<P>, child: P): Iterable<P> {
-  const _parents = filter(g.parent2child, ([_, children]) => has(children, child))
-  const _parentNames = map(_parents, ([key]) => key)
-  return _parentNames
+function _getParents<P>(g: Graph<P>, child: P): Set<P> {
+  const _parents = iFilter(asIterator(g), ([_, children]) => isMember(children, child))
+  const _parentNames = iMap(_parents, ([key]) => key)
+  return new Set(_parentNames)
 }
 
-type GetParents = typeof _getParents
-
-function _hashParents<P>(g: Graph<P>, child: P): string {
-  return `${g.id}--${child}`
+export function getNodes<P>(g: Graph<P>): Set<P> {
+  return new Set(iMap(asIterator(g), ([p]) => p))
 }
 
-export function* getNodes<P>(g: Graph<P>): Iterable<P> {
-  yield* g.parent2child.keys()
-}
-
-export function* asIterable<P>(g: Graph<P>): Iterable<[P, Iterable<P>]> {
-  yield* g.parent2child
+export function* asIterator<P>(g: Graph<P>): Iterable<[P, Set<P>]> {
+  yield* g.parent2children
 }

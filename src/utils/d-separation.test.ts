@@ -6,8 +6,11 @@ import {
   Graph,
   addChild
 } from './graph'
+import {
+  get
+} from './map'
 
-describe.skip('utils/d-separation.ts', () => {
+describe('utils/d-separation.ts', () => {
   describe('function visitableGraph', () => {
     const LIFE_EVENT = {
       BEING_FAT: 'BEING_FAT',
@@ -22,7 +25,7 @@ describe.skip('utils/d-separation.ts', () => {
     }
     type LifeEvent = typeof LIFE_EVENT[keyof typeof LIFE_EVENT]
 
-    let graph: Graph<LifeEvent> = create(LIFE_EVENT.BEING_FAT)
+    let graph: Graph<LifeEvent> = create()
     graph = addChild(graph, LIFE_EVENT.OVEREATING, LIFE_EVENT.BEING_FAT)
     graph = addChild(graph, LIFE_EVENT.LOW_METABOLISM, LIFE_EVENT.BEING_FAT)
     graph = addChild(graph, LIFE_EVENT.EXERCISING, LIFE_EVENT.BEING_FAT)
@@ -37,7 +40,7 @@ describe.skip('utils/d-separation.ts', () => {
       const resMap = visitableGraph(graph, quarantine)
 
       describe(`at node ${LIFE_EVENT.EXERCISING}`, () => {
-        const visitable = resMap.get(LIFE_EVENT.EXERCISING) || new Set()
+        const visitable = get(resMap, LIFE_EVENT.EXERCISING)
         const outstr = [...visitable].join('-')
 
         it('should be sensible', () => {
@@ -55,7 +58,8 @@ describe.skip('utils/d-separation.ts', () => {
       })
 
       describe(`at node ${LIFE_EVENT.POVERTY}`, () => {
-        const visitable = resMap.get(LIFE_EVENT.POVERTY) || new Set()
+        console.log('--- \n\n', resMap)
+        const visitable = get(resMap, LIFE_EVENT.POVERTY)
         const outstr = [...visitable].join('-')
 
         it('should look reasonable', () => {
@@ -68,7 +72,7 @@ describe.skip('utils/d-separation.ts', () => {
       })
 
       describe(`at node ${LIFE_EVENT.AWFUL_BOSS}`, () => {
-        const visitable = resMap.get(LIFE_EVENT.AWFUL_BOSS) || new Set()
+        const visitable = get(resMap, LIFE_EVENT.AWFUL_BOSS)
 
         it(`should now be correlated to ${LIFE_EVENT.POVERTY}`, () => {
           expect(visitable.has(LIFE_EVENT.POVERTY)).toBeTruthy()
@@ -76,7 +80,7 @@ describe.skip('utils/d-separation.ts', () => {
       })
 
       describe(`at node ${LIFE_EVENT.UPSET_STOMACH}`, () => {
-        const visitable = resMap.get(LIFE_EVENT.UPSET_STOMACH) || new Set()
+        const visitable = get(resMap, LIFE_EVENT.UPSET_STOMACH)
 
         it('should not be visitable by anything', () => {
           expect(visitable.size).toEqual(0)
@@ -84,7 +88,7 @@ describe.skip('utils/d-separation.ts', () => {
       })
 
       describe(`at node ${LIFE_EVENT.FAT_GENE}`, () => {
-        const visitable = resMap.get(LIFE_EVENT.FAT_GENE) || new Set()
+        const visitable = get(resMap, LIFE_EVENT.FAT_GENE)
 
         it(`should still be a cause of ${LIFE_EVENT.BEING_FAT} despite controlling for ${LIFE_EVENT.OVEREATING}`, () => {
           expect(visitable.has(LIFE_EVENT.BEING_FAT)).toBeTruthy()
@@ -96,7 +100,7 @@ describe.skip('utils/d-separation.ts', () => {
       })
 
       describe(`at node ${LIFE_EVENT.BEING_FAT}`, () => {
-        const visitables = resMap.get(LIFE_EVENT.BEING_FAT) || new Set()
+        const visitables = get(resMap, LIFE_EVENT.BEING_FAT)
         const DEPENDENCIES = new Set([
           LIFE_EVENT.EXERCISING,
           LIFE_EVENT.LOW_METABOLISM,

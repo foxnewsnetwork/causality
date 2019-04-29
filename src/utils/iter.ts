@@ -64,7 +64,7 @@ export function* unshift<T>(it: Iterable<T>, t: T): Iterable<T> {
   yield* it
 }
 
-export function* zero<T>(): Iterable<T> { }
+export function* zero(): Iterable<any> { }
 
 export function* lift0<T>(t: T): Iterable<T> {
   yield t

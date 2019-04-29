@@ -1,5 +1,5 @@
 import { Fn2, Fn1 } from './types';
-import { getOrDie } from './map';
+import { get } from './map';
 
 export type CachedOutput2<A, B, C> = {
   cachedFn: Fn2<A, B, C>,
@@ -23,7 +23,7 @@ export const cache2: CacheMetaFn2<any, any, any> = (fn, hashFn) => {
   const cachedFn = (a: any, b: any) => {
     const hashKey = hashFn(a, b)
     if (storage.has(hashKey)) {
-      return getOrDie(storage, hashKey)
+      return get(storage, hashKey)
     } else {
       const result = fn(a, b)
       storage.set(hashKey, result)

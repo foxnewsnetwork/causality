@@ -1,8 +1,7 @@
 import {
   Graph,
   getParents,
-  getChildren,
-  getNodes
+  asIterator
 } from './graph';
 import {
   over, getWithDefault
@@ -59,8 +58,7 @@ export function visitableGraph<V>(g: Graph<V>, quaratine: Set<V>): GraphVisitabl
   let notSettled = true;
   while (notSettled) {
     notSettled = false;
-    for (const me of getNodes(g)) {
-      const children = getChildren(g, me)
+    for (const [me, children] of asIterator(g)) {
       const parents = getParents(g, me)
       const receivedMail = getMail(server, me)
       const visitedSenders = getWithDefault(visitableMap, me, () => new Set())
