@@ -11,8 +11,6 @@ export type Graph<P> = {
 
 type BustCacheFn = <P>(g: Graph<P>, name: P) => void;
 
-
-// Currently not working
 type GetParents = typeof _getParents
 function _hashParents<P>(g: Graph<P>, child: P): string {
   return `${g.id}--${child}`
