@@ -4,12 +4,12 @@ import {
   asIterator
 } from './graph';
 import {
-  over, getWithDefault
+  over, get
 } from './map';
 import {
   create, MailServer, getMail, spamMail, spamBulkMail
 } from './mail-server';
-import { filter, any, has } from './iter';
+import { filter, any, has, map } from './iter';
 
 /**
  * Is there a path between two points on a graph given a set of
@@ -51,9 +51,17 @@ type Postcard<V> = {
   sender: V
 }
 
+function initVisitMap<V>(g: Graph<V>): GraphVisitableMap<V> {
+  const map = new Map()
+  for (const [me] of asIterator(g)) {
+    map.set(me, new Set([me]))
+  }
+  return map
+}
+
 export function visitableGraph<V>(g: Graph<V>, quaratine: Set<V>): GraphVisitableMap<V> {
   let server: MailServer<V, Postcard<V>> = create()
-  let visitableMap: GraphVisitableMap<V> = new Map()
+  let visitableMap: GraphVisitableMap<V> = initVisitMap(g)
 
   let notSettled = true;
   while (notSettled) {
@@ -61,7 +69,7 @@ export function visitableGraph<V>(g: Graph<V>, quaratine: Set<V>): GraphVisitabl
     for (const [me, children] of asIterator(g)) {
       const parents = getParents(g, me)
       const receivedMail = getMail(server, me)
-      const visitedSenders = getWithDefault(visitableMap, me, () => new Set())
+      const visitedSenders = get(visitableMap, me)
 
       for (const postcard of receivedMail) {
         if (visitedSenders.has(postcard.sender)) {
