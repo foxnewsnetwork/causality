@@ -37,7 +37,7 @@ describe('utils/d-separation.ts', () => {
       [LIFE_EVENT.POVERTY, LIFE_EVENT.STRESSED]
     ]
     const GRAPH: Graph<LifeEvent> = reduce(
-      CONNECTIONS, 
+      CONNECTIONS,
       (graph, [parent, child]) => connect(graph, parent, child),
       create()
     )
@@ -48,48 +48,56 @@ describe('utils/d-separation.ts', () => {
 
       describe(`at node ${LIFE_EVENT.EXERCISING}`, () => {
         const visitable = get(resMap, LIFE_EVENT.EXERCISING)
-        const outstr = [...visitable].join('-')
-
-        it('should be sensible', () => {
-          expect(outstr).toEqual(LIFE_EVENT.BEING_FAT)
+        it('should only have two members', () => {
+          expect(visitable).toHaveProperty("size", 2)
         })
+
         it(`should cause ${LIFE_EVENT.BEING_FAT}`, () => {
           expect(visitable.has(LIFE_EVENT.BEING_FAT)).toBeTruthy()
         })
 
-        describe(`collider with ${LIFE_EVENT.BEING_FAT}`, () => {
-          it('should be be independent from the other nodes', () => {
-            expect(visitable.size).toEqual(1)
-          })
+        it(`should be reflective on the self`, () => {
+          expect(visitable.has(LIFE_EVENT.EXERCISING)).toBeTruthy()
         })
       })
 
       describe(`at node ${LIFE_EVENT.POVERTY}`, () => {
         const visitable = get(resMap, LIFE_EVENT.POVERTY)
-        const outstr = [...visitable].join('-')
-
-        it('should look reasonable', () => {
-          expect(outstr).toEqual(LIFE_EVENT.AWFUL_BOSS)
+        it('should have 3 nodes that affect me', () => {
+          expect(visitable).toHaveProperty("size", 3)
         })
 
-        it(`should now be correlated to ${LIFE_EVENT.AWFUL_BOSS}`, () => {
-          expect(visitable.has(LIFE_EVENT.AWFUL_BOSS)).toBeTruthy()
-        })
+        const EVENTS = [LIFE_EVENT.AWFUL_BOSS, LIFE_EVENT.POVERTY, LIFE_EVENT.STRESSED]
+        for (const EVENT of EVENTS) {
+          it(`should now be correlated to ${EVENT}`, () => {
+            expect(visitable.has(EVENT)).toBeTruthy()
+          })
+        }
       })
 
       describe(`at node ${LIFE_EVENT.AWFUL_BOSS}`, () => {
         const visitable = get(resMap, LIFE_EVENT.AWFUL_BOSS)
-
-        it(`should now be correlated to ${LIFE_EVENT.POVERTY}`, () => {
-          expect(visitable.has(LIFE_EVENT.POVERTY)).toBeTruthy()
+        it('should have 3 nodes that affect me', () => {
+          expect(visitable).toHaveProperty("size", 3)
         })
+
+        const EVENTS = [LIFE_EVENT.AWFUL_BOSS, LIFE_EVENT.POVERTY, LIFE_EVENT.STRESSED]
+        for (const EVENT of EVENTS) {
+          it(`should now be correlated to ${EVENT}`, () => {
+            expect(visitable.has(EVENT)).toBeTruthy()
+          })
+        }
       })
 
       describe(`at node ${LIFE_EVENT.UPSET_STOMACH}`, () => {
         const visitable = get(resMap, LIFE_EVENT.UPSET_STOMACH)
 
-        it('should not be visitable by anything', () => {
-          expect(visitable.size).toEqual(0)
+        it('should not be visitable by anything other than itself', () => {
+          expect(visitable.size).toEqual(1)
+        })
+
+        it('should be visitable only by itself', () => {
+          expect(visitable.has(LIFE_EVENT.UPSET_STOMACH)).toBeTruthy()
         })
       })
 
@@ -110,13 +118,15 @@ describe('utils/d-separation.ts', () => {
         const DEPENDENCIES = new Set([
           LIFE_EVENT.EXERCISING,
           LIFE_EVENT.LOW_METABOLISM,
-          LIFE_EVENT.FAT_GENE
+          LIFE_EVENT.FAT_GENE,
+          LIFE_EVENT.BEING_FAT
         ])
         const INDEPENDENCIES = new Set([
           LIFE_EVENT.UPSET_STOMACH,
           LIFE_EVENT.STRESSED,
           LIFE_EVENT.POVERTY,
-          LIFE_EVENT.AWFUL_BOSS
+          LIFE_EVENT.AWFUL_BOSS,
+          LIFE_EVENT.OVEREATING
         ])
 
         for (const dep of DEPENDENCIES) {
