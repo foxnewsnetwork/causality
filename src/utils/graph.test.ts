@@ -1,4 +1,4 @@
-import { create, addChild, getChildren, getParents } from "./graph";
+import { create, connect, getChildren, getParents } from "./graph";
 import { has } from "./iter";
 
 const SCHOOL_EVENT = {
@@ -19,8 +19,8 @@ describe("utils/graph.ts", () => {
       expect(graph).toHaveProperty("id")
     })
 
-    describe("function addChild", () => {
-      const graph2 = addChild(graph, SCHOOL_EVENT.DO_DRUGS, SCHOOL_EVENT.BAD_GRADES)
+    describe("function connect", () => {
+      const graph2 = connect(graph, SCHOOL_EVENT.DO_DRUGS, SCHOOL_EVENT.BAD_GRADES)
 
       describe('property immutability', () => {
         it('should be an immutable object', () => {

@@ -32,7 +32,7 @@ export function create<P>(): Graph<P> {
   return me;
 }
 
-export function addChild<P>(g: Graph<P>, parent: P, child: P): Graph<P> {
+export function connect<P>(g: Graph<P>, parent: P, child: P): Graph<P> {
   const _parent2children = over(g.parent2children, parent, (children = empty()) => {
     if (!isMember(children, child)) {
       bustCache(g, parent)

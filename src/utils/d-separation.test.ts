@@ -4,11 +4,12 @@ import {
 import {
   create,
   Graph,
-  addChild
+  connect
 } from './graph'
 import {
   get
 } from './map'
+import { reduce } from './iter';
 
 describe('utils/d-separation.ts', () => {
   describe('function visitableGraph', () => {
@@ -25,19 +26,25 @@ describe('utils/d-separation.ts', () => {
     }
     type LifeEvent = typeof LIFE_EVENT[keyof typeof LIFE_EVENT]
 
-    let graph: Graph<LifeEvent> = create()
-    graph = addChild(graph, LIFE_EVENT.OVEREATING, LIFE_EVENT.BEING_FAT)
-    graph = addChild(graph, LIFE_EVENT.LOW_METABOLISM, LIFE_EVENT.BEING_FAT)
-    graph = addChild(graph, LIFE_EVENT.EXERCISING, LIFE_EVENT.BEING_FAT)
-    graph = addChild(graph, LIFE_EVENT.FAT_GENE, LIFE_EVENT.LOW_METABOLISM)
-    graph = addChild(graph, LIFE_EVENT.STRESSED, LIFE_EVENT.OVEREATING)
-    graph = addChild(graph, LIFE_EVENT.OVEREATING, LIFE_EVENT.UPSET_STOMACH)
-    graph = addChild(graph, LIFE_EVENT.AWFUL_BOSS, LIFE_EVENT.STRESSED)
-    graph = addChild(graph, LIFE_EVENT.POVERTY, LIFE_EVENT.STRESSED)
+    const CONNECTIONS = [
+      [LIFE_EVENT.OVEREATING, LIFE_EVENT.BEING_FAT],
+      [LIFE_EVENT.LOW_METABOLISM, LIFE_EVENT.BEING_FAT],
+      [LIFE_EVENT.EXERCISING, LIFE_EVENT.BEING_FAT],
+      [LIFE_EVENT.FAT_GENE, LIFE_EVENT.LOW_METABOLISM],
+      [LIFE_EVENT.STRESSED, LIFE_EVENT.OVEREATING],
+      [LIFE_EVENT.OVEREATING, LIFE_EVENT.UPSET_STOMACH],
+      [LIFE_EVENT.AWFUL_BOSS, LIFE_EVENT.STRESSED],
+      [LIFE_EVENT.POVERTY, LIFE_EVENT.STRESSED]
+    ]
+    const GRAPH: Graph<LifeEvent> = reduce(
+      CONNECTIONS, 
+      (graph, [parent, child]) => connect(graph, parent, child),
+      create()
+    )
 
     describe('controlling for OVEREATING', () => {
       const quarantine = new Set([LIFE_EVENT.OVEREATING])
-      const resMap = visitableGraph(graph, quarantine)
+      const resMap = visitableGraph(GRAPH, quarantine)
 
       describe(`at node ${LIFE_EVENT.EXERCISING}`, () => {
         const visitable = get(resMap, LIFE_EVENT.EXERCISING)
@@ -58,7 +65,6 @@ describe('utils/d-separation.ts', () => {
       })
 
       describe(`at node ${LIFE_EVENT.POVERTY}`, () => {
-        console.log('--- \n\n', resMap)
         const visitable = get(resMap, LIFE_EVENT.POVERTY)
         const outstr = [...visitable].join('-')
 
