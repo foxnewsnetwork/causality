@@ -2,37 +2,42 @@ import {
   CausalModel
 } from './causal-model'
 
-enum Bonus {
+const enum Bonus {
   High,
   Medium,
   Low
 }
-enum Review {
+const enum Review {
   Excellent,
   Good,
   Okay,
   Bad
 }
-enum Rank {
+const enum Rank {
   Principle,
   Staff,
   Senior,
   Standard,
   Junior
 }
-enum Performance {
+const enum Performance {
   Great,
   Good,
   Okay,
   Bad
 }
-enum MarketCondition {
+const enum Skill {
+  Rockstar,
+  Normal,
+  Subpar
+}
+const enum MarketCondition {
   Bubble,
   Bull,
   Bear,
   Depression
 }
-type WorkModel = {
+type WorkParametrization = {
   bonus: (p: {
     review: Review,
     rank: Rank,
@@ -42,6 +47,14 @@ type WorkModel = {
     performance: Performance,
     market: MarketCondition
   }) => Review,
-}
+  rank: () => Rank,
+  performance: (p: {
+    skill: Skill
+  }) => Performance,
+  skill: () => Skill,
+  MarketCondition: () => MarketCondition
+};
+
+
 describe('utils/causal-model.ts', () => {
 })

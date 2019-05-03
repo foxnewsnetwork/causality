@@ -1,4 +1,5 @@
 import { Fn2, Fn1 } from "./types";
+import { all } from "./iter";
 
 /**
  * Set helpers
@@ -96,4 +97,19 @@ export function cardinality(sA: Set<any>): number {
 
 export function isMember<T>(s: Set<T>, t: T): boolean {
   return s.has(t)
+}
+
+/**
+ * Checks if two sets are equal to each other;
+ * they are equal IFF they have the same "cardinality",
+ * and are subsets of each other
+ * @param sA 
+ * @param sB 
+ */
+export function isEqual<T>(sA: Set<T>, sB: Set<T>): boolean {
+  return cardinality(sA) === cardinality(sB) && isSubset(sA, sB)
+}
+
+export function isSubset<T>(superSet: Set<T>, childSet: Set<T>): boolean {
+  return all(childSet, childMember => isMember(superSet, childMember))
 }
