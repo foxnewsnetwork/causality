@@ -1,11 +1,9 @@
 import { Graph } from "./graph";
 import { assert } from "./misc";
 import { isEqual } from "./set";
+import { Variable } from "./variable";
 
-export type Equation<V> = (params?: { [key: string]: any }) => V
-export type Parametrization = {
-  [key: string]: Equation<any>
-}
+export type Parametrization = Record<string, Variable>
 /**
  * This is defintion 2.2.2 on page 44 of the causality book
  */
@@ -17,9 +15,9 @@ export type CausalModel = {
 /**
  * Definition 2.3.2
  */
-export type LatentStructure<Vars> = {
-  structure: Graph<Vars>,
-  observables: Set<Vars>
+export type LatentStructure = {
+  structure: Graph<string>,
+  observables: Set<typeof Variable>
 }
 
 /**
@@ -36,7 +34,7 @@ export type LatentStructure<Vars> = {
  * @param strA 
  * @param strB 
  */
-export function isPreferred<V>(strA: LatentStructure<V>, strB: LatentStructure<V>): boolean {
+export function isPreferred(strA: LatentStructure, strB: LatentStructure): boolean {
   assert(
     isEqual(strA.observables, strB.observables), 
     "Can't prefer models with different observables"
@@ -45,4 +43,8 @@ export function isPreferred<V>(strA: LatentStructure<V>, strB: LatentStructure<V
   // Somehow implement that every `CausalModel` of `strA`
   // has a distribution that can be equivalent some
   // CausalModel of `strB`
+}
+
+export function* genLinearCausalModels(struct: LatentStructure): Iterable<CausalModel> {
+  
 }
