@@ -1,15 +1,15 @@
 import { Graph } from "./graph";
 import { assert } from "./misc";
 import { isEqual } from "./set";
-import { Variable } from "./variable";
+import { Variable } from "./probability";
+import { Parameterization } from "./equation";
 
-export type Parametrization = Record<string, Variable>
 /**
  * This is defintion 2.2.2 on page 44 of the causality book
  */
 export type CausalModel = {
   structure: Graph<string>,
-  parameters: Parametrization
+  parameters: Parameterization<any>
 }
 
 /**
@@ -17,7 +17,7 @@ export type CausalModel = {
  */
 export type LatentStructure = {
   structure: Graph<string>,
-  observables: Set<typeof Variable>
+  observables: Set<Variable<any>>
 }
 
 /**
@@ -36,7 +36,7 @@ export type LatentStructure = {
  */
 export function isPreferred(strA: LatentStructure, strB: LatentStructure): boolean {
   assert(
-    isEqual(strA.observables, strB.observables), 
+    isEqual(strA.observables, strB.observables),
     "Can't prefer models with different observables"
   )
 
@@ -46,5 +46,5 @@ export function isPreferred(strA: LatentStructure, strB: LatentStructure): boole
 }
 
 export function* genLinearCausalModels(struct: LatentStructure): Iterable<CausalModel> {
-  
+
 }

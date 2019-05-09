@@ -15,7 +15,3 @@ export type ProbabilityTableEntry<Enum> = {
 export type Probability = number;
 
 export type ProbabilityTable<Enum, V extends Variable<Enum>> = Record<V["name"], Distribution<Enum>>
-
-export type StochasticEquation<Enum> = () => Distribution<Enum>
-
-export type StructuralEquation<Enum> = (parents: Dependencies<any>) => Enum
