@@ -1,5 +1,5 @@
 import { Dependencies, Distribution, Variable } from './probability'
-import { map, reduce, enumerate } from './set';
+import { map, reduce, enumerate, isEmpty } from './set';
 import { reduce as mReduce, getWithDefault } from './map';
 import { random } from './integer';
 
@@ -15,7 +15,7 @@ export function randomLinear<V, Var extends Variable<V>>(
   variable: Var, 
   parents?: Set<Variable<any>>
 ): Equation<V> {
-  if (parents == null) {
+  if (parents == null || isEmpty(parents)) {
     return randomStochastic(variable)
   } else {
     return randomLinearStructural(variable, parents)

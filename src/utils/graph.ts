@@ -80,3 +80,9 @@ export function getNodes<P>(g: Graph<P>): Set<P> {
 export function* asIterator<P>(g: Graph<P>): Iterable<[P, Set<P>]> {
   yield* g.parent2children
 }
+
+export function* asIterator2<P>(g: Graph<P>): Iterable<[Set<P>, P, Set<P>]> {
+  for (const [self, children] of asIterator(g)) {
+    yield [getParents(g, self), self, children]
+  }
+}

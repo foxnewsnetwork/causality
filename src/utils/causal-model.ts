@@ -1,8 +1,9 @@
-import { Graph } from "./graph";
+import { Graph, asIterator2, asIterator } from "./graph";
 import { assert } from "./misc";
-import { isEqual } from "./set";
+import { isEqual, isEmpty, map } from "./set";
 import { Variable } from "./probability";
-import { Parameterization } from "./equation";
+import { Parameterization, randomLinear } from "./equation";
+import { all } from "./iter";
 
 /**
  * This is defintion 2.2.2 on page 44 of the causality book
@@ -17,7 +18,21 @@ export type CausalModel = {
  */
 export type LatentStructure = {
   structure: Graph<string>,
-  observables: Set<Variable<any>>
+  observables: Set<Variable<any>>,
+  unobservables: Set<Variable<any>>
+}
+
+/**
+ * A structure is only valid if:
+ * 
+ * - every node is either observable or unobservable
+ * 
+ * @param struct 
+ */
+export function isValid(struct: LatentStructure): boolean {
+  const obs = map(struct.observables, ({ name }) => name)
+  const unobs = map(struct.unobservables, ({ name }) => name)
+  return all(asIterator(struct.structure), ([name]) => obs.has(name) || unobs.has(name))
 }
 
 /**
@@ -46,5 +61,13 @@ export function isPreferred(strA: LatentStructure, strB: LatentStructure): boole
 }
 
 export function* genLinearCausalModels(struct: LatentStructure): Iterable<CausalModel> {
+  while(true) {
+    yield randomLinearCausalModel(struct)
+  }
+}
 
+export function randomLinearCausalModel(struct: LatentStructure): CausalModel {
+  // generate stochastic equations
+
+  // generate structural equations
 }
