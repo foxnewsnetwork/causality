@@ -1,17 +1,17 @@
-export type Variable<Enum> = {
+export type Variable<Value> = {
   name: string,
-  domain: Enum
+  domain: Set<Value>
 }
-export type Dependencies<Enum> = Record<Variable<Enum>["name"], Variable<Enum>["domain"]>;
+export type Dependencies<Value> = Map<Variable<Value>["name"], Value>;
 
-export type Distribution<Enum> = Iterable<ProbabilityTableEntry<Enum>>
+export type Distribution<V> = Iterable<ProbabilityTableEntry<V>>
 
-export type ProbabilityTableEntry<Enum> = {
-  event: Enum,
+export type ProbabilityTableEntry<Value> = {
+  event: Value,
   probability: Probability
 }
 
 // Number between 0 and 1
 export type Probability = number;
 
-export type ProbabilityTable<Enum, V extends Variable<Enum>> = Record<V["name"], Distribution<Enum>>
+export type ProbabilityTable<Value> = Map<Value, ProbabilityTableEntry<Value>>

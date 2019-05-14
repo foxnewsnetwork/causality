@@ -113,3 +113,12 @@ export function isEqual<T>(sA: Set<T>, sB: Set<T>): boolean {
 export function isSubset<T>(superSet: Set<T>, childSet: Set<T>): boolean {
   return all(childSet, childMember => isMember(superSet, childMember))
 }
+
+/**
+ * Takes a set and returns a set of its index
+ * @param set any countable finite set
+ */
+export function enumerate<T>(set: Set<T>): Map<T, number> {
+  let i = 0;
+  return new Map(map(set, member => [member, i++]))
+}

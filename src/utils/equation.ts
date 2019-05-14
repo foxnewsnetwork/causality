@@ -1,32 +1,60 @@
-import { Dependencies, Distribution, ProbabilityTableEntry } from './probability'
+import { Dependencies, Distribution, Variable } from './probability'
+import { map, reduce, enumerate } from './set';
+import { reduce as mReduce, getWithDefault } from './map';
+import { random } from './integer';
 
-export type StochasticEquation<Enum> = () => Distribution<Enum>
+export type StochasticEquation<V> = Distribution<V>
 
-export type StructuralEquation<Enum> = (parents: Dependencies<any>) => Enum
+export type StructuralEquation<V> = (parents: Dependencies<any>) => V
 
-export type Equation<Enum> = StochasticEquation<Enum> | StructuralEquation<Enum>
+export type Equation<V> = StochasticEquation<V> | StructuralEquation<V>
 
-export type Parameterization<Enum> = Map<Enum, Equation<Enum>>
+export type Parameterization<Value> = Map<Variable<Value>, Equation<Value>>
 
-type Enum = Record<string, number>
-
-export function randomLinear<E extends Enum>(Enum: E, parents?: Iterable<Enum>): Equation<E[keyof E]> {
-  if (parents != null) {
-    return randomStochastic(Enum)
+export function randomLinear<V, Var extends Variable<V>>(
+  variable: Var, 
+  parents?: Set<Variable<any>>
+): Equation<V> {
+  if (parents == null) {
+    return randomStochastic(variable)
   } else {
-    return randomLinearStructural(Enum, parents)
+    return randomLinearStructural(variable, parents)
   }
 }
 
 // Running into problems with enum types not being open to meta typing
 // might need to use a Map type of some sort
 
-export function* randomStochastic<E extends Enum>(Enum: E): StochasticEquation<E[keyof E]> {
-  for (const key of Object.getOwnPropertyNames(Enum)) {
-    const tableEntry = {
-      event: Enum[key],
-      probability: Math.random()
-    }
-    yield tableEntry
+export function* randomStochastic<V>(variable: Variable<V>): StochasticEquation<V> {
+  const _x = map(variable.domain, event => ({ event, odds: Math.random() }))
+  const _odds = map(_x, ({ odds }) => odds )
+  const total = reduce(_odds, (a, b) => a + b, 0)
+  yield* map(_x, ({ event, odds }) => ({
+    event,
+    probability: odds / total
+  }))
+}
+
+export function randomLinearStructural<V>(variable: Variable<V>, parents: Set<Variable<any>>): StructuralEquation<V> {
+  const valueMap = new Map(map(parents, v => [v.name, {
+    domainMap: enumerate(v.domain),
+    weight: random()
+  }]))
+
+  const myDomain = [...variable.domain]
+
+  return deps => {
+
+    const unwrappedIndex = mReduce(
+      deps, 
+      (indexAcc, [name, valueKey]) => {
+        const valMap = getWithDefault(valueMap, name, () => ({ domainMap: new Map(), weight: 0 }))
+        const value = getWithDefault(valMap.domainMap, valueKey, () => 0)
+        return indexAcc + value * valMap.weight
+      },
+      0
+    )
+
+    return myDomain[unwrappedIndex % myDomain.length]
   }
 }
