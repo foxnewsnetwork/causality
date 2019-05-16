@@ -2,18 +2,23 @@ import { getWithDefault, over } from './map';
 import { guid } from './misc';
 import { filter as iFilter, map as iMap } from './iter';
 import { empty, isMember, add, union, isEmpty, lift0, map, flatMap } from './set';
-import { cache2 } from './func';
+import { cache2, CachedOutput2 } from './func';
+import { Showable } from './types';
 
-export type Graph<P> = {
+export type Graph<P extends Showable> = {
   id: string,
   parent2children: Map<P, Set<P>>
 };
 
 type BustCacheFn = <P>(g: Graph<P>, name: P) => void;
-
+function _getParents<P extends Showable>(g: Graph<P>, child: P): Set<P> {
+  const _parents = iFilter(asIterator(g), ([_, children]) => isMember(children, child))
+  const _parentNames = iMap(_parents, ([key]) => key)
+  return new Set(_parentNames)
+}
 type GetParents = typeof _getParents
-function _hashParents<P>(g: Graph<P>, child: P): string {
-  return `${g.id}--${child}`
+function _hashParents<P extends Showable>(g: Graph<P>, child: P): string {
+  return `${g.id}--${child.toString()}`
 }
 const cached = cache2(_getParents, _hashParents);
 export const getParents: GetParents = cached.cachedFn;
@@ -65,12 +70,6 @@ export function getDescendants<P>(g: Graph<P>, parent: P): Set<P> {
   } else {
     return flatMap(children, child => getDescendants(g, child))
   }
-}
-
-function _getParents<P>(g: Graph<P>, child: P): Set<P> {
-  const _parents = iFilter(asIterator(g), ([_, children]) => isMember(children, child))
-  const _parentNames = iMap(_parents, ([key]) => key)
-  return new Set(_parentNames)
 }
 
 export function getNodes<P>(g: Graph<P>): Set<P> {

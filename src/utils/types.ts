@@ -12,3 +12,7 @@ export type Fn3<A1, A2, A3, B> = (a1: A1, a2: A2, a3: A3) => B
 export type Param1<T extends (...args: any[]) => any> = Parameters<T>[0]
 
 export type Param2<T extends (...args: any[]) => any> = Parameters<T>[1]
+
+export type Showable = {
+  toString: () => string
+}

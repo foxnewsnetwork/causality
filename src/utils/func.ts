@@ -6,10 +6,7 @@ export type CachedOutput2<A, B, C> = {
   bustFn: Fn2<A, B, void>
 }
 
-export type CacheMetaFn2<A1, A2, R> = (
-  fn2Cache: (a1: A1, a2: A2) => R,
-  hashFn: (a1: A1, a2: A2) => string
-) => CachedOutput2<A1, A2, R>
+export type CacheMetaFn2 = typeof cache2
 /**
  * Takes a function and returns a function that
  * caches its results based upon the results of
@@ -17,7 +14,10 @@ export type CacheMetaFn2<A1, A2, R> = (
  * @param fn - function to cache
  * @param hashFn - expiration checker
  */
-export const cache2: CacheMetaFn2<any, any, any> = (fn, hashFn) => {
+export function cache2<In1, In2, Out>(
+  fn: (i1: In1, i2: In2) => Out,
+  hashFn: (i1: In1, i2: In2) => string,
+): CachedOutput2<In1, In2, Out> {
   const storage: Map<string, any> = new Map()
 
   const cachedFn = (a: any, b: any) => {
