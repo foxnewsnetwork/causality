@@ -7,7 +7,7 @@ import { all } from "./iter";
  * Definition 2.3.2
  */
 export type LatentStructure = {
-  structure: Graph<string>,
+  structure: Graph<Variable<any>>,
   observables: Set<Variable<any>>,
   unobservables: Set<Variable<any>>
 }
@@ -20,7 +20,9 @@ export type LatentStructure = {
  * @param struct 
  */
 export function isValid(struct: LatentStructure): boolean {
-  const obs = map(struct.observables, ({ name }) => name)
-  const unobs = map(struct.unobservables, ({ name }) => name)
-  return all(asIterator(struct.structure), ([name]) => obs.has(name) || unobs.has(name))
+  const {
+    observables,
+    unobservables
+  } = struct;
+  return all(asIterator(struct.structure), ([variable]) => observables.has(variable) || unobservables.has(variable))
 }

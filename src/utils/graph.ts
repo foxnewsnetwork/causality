@@ -1,7 +1,7 @@
 import { getWithDefault, over } from './map';
 import { guid } from './misc';
 import { filter as iFilter, map as iMap } from './iter';
-import { empty, isMember, add, union, isEmpty, lift0, map, flatMap } from './set';
+import { empty, isMember, add, union, isEmpty, lift0, flatMap } from './set';
 import { cache2, CachedOutput2 } from './func';
 import { Showable } from './types';
 
@@ -10,21 +10,23 @@ export type Graph<P extends Showable> = {
   parent2children: Map<P, Set<P>>
 };
 
-type BustCacheFn = <P>(g: Graph<P>, name: P) => void;
-function _getParents<P extends Showable>(g: Graph<P>, child: P): Set<P> {
+function _getParents<Sh>(g: Graph<Sh>, child: Sh): Set<Sh> {
   const _parents = iFilter(asIterator(g), ([_, children]) => isMember(children, child))
   const _parentNames = iMap(_parents, ([key]) => key)
   return new Set(_parentNames)
 }
 type GetParents = typeof _getParents
-function _hashParents<P extends Showable>(g: Graph<P>, child: P): string {
+function _hashParents(g: Graph<Showable>, child: Showable): string {
   return `${g.id}--${child.toString()}`
 }
-const cached = cache2(_getParents, _hashParents);
-export const getParents: GetParents = cached.cachedFn;
-const bustCache: BustCacheFn = cached.bustFn
+type _P0 = Parameters<GetParents>[0]
+type _P1 = Parameters<GetParents>[1]
+type _R0 = ReturnType<GetParents>
+const cached: CachedOutput2<_P0, _P1, _R0> = cache2(_getParents, _hashParents);
+export const getParents = cached.cachedFn as GetParents;
+const bustCache = cached.bustFn
 
-export function create<P>(): Graph<P> {
+export function create<P extends Showable>(): Graph<P> {
   const id = guid()
   const parent2children: Map<P, Set<P>> = new Map()
 
@@ -35,7 +37,7 @@ export function create<P>(): Graph<P> {
   return me;
 }
 
-export function connect<P>(g: Graph<P>, parent: P, child: P): Graph<P> {
+export function connect<Sh>(g: Graph<Sh>, parent: Sh, child: Sh): Graph<Sh> {
   const _parent2children = over(g.parent2children, parent, (children = empty()) => {
     if (!isMember(children, child)) {
       bustCache(g, parent)
@@ -52,18 +54,18 @@ export function connect<P>(g: Graph<P>, parent: P, child: P): Graph<P> {
   }
 }
 
-export function getNeighbors<P>(g: Graph<P>, me: P): Set<P> {
+export function getNeighbors<Sh>(g: Graph<Sh>, me: Sh): Set<Sh> {
   const children = getChildren(g, me)
   const parents = getParents(g, me)
 
   return union(parents, children)
 }
 
-export function getChildren<P>(g: Graph<P>, parent: P): Set<P> {
+export function getChildren<Sh>(g: Graph<Sh>, parent: Sh): Set<Sh> {
   return getWithDefault(g.parent2children, parent, empty);
 }
 
-export function getDescendants<P>(g: Graph<P>, parent: P): Set<P> {
+export function getDescendants<Sh>(g: Graph<Sh>, parent: Sh): Set<Sh> {
   const children = getChildren(g, parent);
   if (isEmpty(children)) {
     return lift0(parent)
@@ -72,15 +74,15 @@ export function getDescendants<P>(g: Graph<P>, parent: P): Set<P> {
   }
 }
 
-export function getNodes<P>(g: Graph<P>): Set<P> {
+export function getNodes<Sh>(g: Graph<Sh>): Set<Sh> {
   return new Set(iMap(asIterator(g), ([p]) => p))
 }
 
-export function* asIterator<P>(g: Graph<P>): Iterable<[P, Set<P>]> {
+export function* asIterator<Sh>(g: Graph<Sh>): Iterable<[Sh, Set<Sh>]> {
   yield* g.parent2children
 }
 
-export function* asIterator2<P>(g: Graph<P>): Iterable<[Set<P>, P, Set<P>]> {
+export function* asIterator2<Sh>(g: Graph<Sh>): Iterable<[Set<Sh>, Sh, Set<Sh>]> {
   for (const [self, children] of asIterator(g)) {
     yield [getParents(g, self), self, children]
   }

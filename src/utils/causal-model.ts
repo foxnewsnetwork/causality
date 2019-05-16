@@ -1,14 +1,17 @@
-import { Graph } from "./graph";
+import { Graph, getParents } from "./graph";
 import { assert } from "./misc";
-import { isEqual, map } from "./set";
-import { Parameterization, randomLinear } from "./equation";
+import { isEqual, map, union } from "./set";
+import { Parameterization, randomStochastic, randomLinearStructural } from "./equation";
 import { LatentStructure } from './latent-structure';
+import { Variable } from './probability';
+import { reduce } from "./iter";
+import { T2 } from "./types";
 
 /**
  * This is defintion 2.2.2 on page 44 of the causality book
  */
 export type CausalModel = {
-  structure: Graph<string>,
+  structure: Graph<Variable<any>>,
   parameters: Parameterization<any>
 }
 
@@ -43,8 +46,16 @@ export function* genLinearCausalModels(struct: LatentStructure): Iterable<Causal
   }
 }
 
-export function randomLinearCausalModel(struct: LatentStructure): CausalModel {
+export function randomLinearCausalModel(structure: LatentStructure): CausalModel {
   // generate stochastic equations
-  const stochasticEqs = map(struct.unobservables, randomLinear)
+  const stochasticPairs = map(structure.unobservables, unobs => [unobs, randomStochastic(unobs)])
   // generate structural equations
+  const structuralPairs = map(structure.observables, obs =>
+    [obs, randomLinearStructural(obs, getParents(structure.structure, obs))]
+  )
+
+  return {
+    structure: structure.structure,
+    parameters
+  }
 }

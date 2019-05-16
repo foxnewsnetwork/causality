@@ -1,4 +1,6 @@
-export type Variable<Value> = {
+import { Showable } from './types'
+
+export type Variable<Value> = Showable & {
   name: string,
   domain: Set<Value>
 }
