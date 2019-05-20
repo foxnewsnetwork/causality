@@ -12,7 +12,7 @@ import { T2 } from "./types";
  */
 export type CausalModel = {
   structure: Graph<Variable<any>>,
-  parameters: Parameterization<any>
+  parameterization: Parameterization<any>
 }
 
 /**
@@ -48,14 +48,27 @@ export function* genLinearCausalModels(struct: LatentStructure): Iterable<Causal
 
 export function randomLinearCausalModel(structure: LatentStructure): CausalModel {
   // generate stochastic equations
-  const stochasticPairs = map(structure.unobservables, unobs => [unobs, randomStochastic(unobs)])
+  const stochasticPairs = map(structure.unobservables, variable => ({
+    variable, 
+    equation: randomStochastic(variable)
+  }))
   // generate structural equations
-  const structuralPairs = map(structure.observables, obs =>
-    [obs, randomLinearStructural(obs, getParents(structure.structure, obs))]
-  )
+  const structuralPairs = map(structure.observables, variable => ({
+    variable,
+    equation: randomLinearStructural(variable, getParents(structure.structure, variable))
+  }))
+  const parameterization: Parameterization<any> = new Map()
+
+  for(const { variable, equation } of stochasticPairs) {
+    parameterization.set(variable, equation)
+  }
+
+  for(const { variable, equation } of structuralPairs) {
+    parameterization.set(variable, equation)
+  }
 
   return {
     structure: structure.structure,
-    parameters
+    parameterization
   }
 }
