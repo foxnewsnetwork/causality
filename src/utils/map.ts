@@ -32,6 +32,16 @@ export function set<K, V>(record: Map<K, V>, key: K, value: V): Map<K, V> {
   return clone(record).set(key, value)
 }
 
+/**
+ * Mutable variant of the set method, but returns the map
+ * @param record 
+ * @param key 
+ * @param value 
+ */
+export function mutSet<K, V>(record: Map<K, V>, key: K, value: V): Map<K, V> {
+  return record.set(key, value)
+}
+
 export function remove<K, V>(record: Map<K, V>, key: K): Map<K, V> {
   const out = clone(record)
   out.delete(key)

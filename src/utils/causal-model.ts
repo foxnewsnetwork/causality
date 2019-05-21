@@ -1,11 +1,11 @@
 import { Graph, getParents } from "./graph";
 import { assert } from "./misc";
-import { isEqual, map, union } from "./set";
-import { Parameterization, randomStochastic, randomLinearStructural } from "./equation";
+import { isEqual, map } from "./set";
+import { Parameterization, randomStochastic, randomLinearStructural, Equation } from "./equation";
 import { LatentStructure } from './latent-structure';
 import { Variable } from './probability';
 import { reduce } from "./iter";
-import { T2 } from "./types";
+import { mutSet } from './map';
 
 /**
  * This is defintion 2.2.2 on page 44 of the causality book
@@ -46,26 +46,27 @@ export function* genLinearCausalModels(struct: LatentStructure): Iterable<Causal
   }
 }
 
+type EqPair<T> = {
+  variable: Variable<T>,
+  equation: Equation<T>
+}
+const reduceParam = <T>(map: Parameterization<T>, pair: EqPair<T>) => mutSet(map, pair.variable, pair.equation)
 export function randomLinearCausalModel(structure: LatentStructure): CausalModel {
   // generate stochastic equations
   const stochasticPairs = map(structure.unobservables, variable => ({
     variable, 
     equation: randomStochastic(variable)
   }))
+
   // generate structural equations
   const structuralPairs = map(structure.observables, variable => ({
     variable,
     equation: randomLinearStructural(variable, getParents(structure.structure, variable))
   }))
-  const parameterization: Parameterization<any> = new Map()
-
-  for(const { variable, equation } of stochasticPairs) {
-    parameterization.set(variable, equation)
-  }
-
-  for(const { variable, equation } of structuralPairs) {
-    parameterization.set(variable, equation)
-  }
+  
+  // Put the pairs into a parameterization
+  const _para = reduce(stochasticPairs, reduceParam, new Map())
+  const parameterization = reduce(structuralPairs, reduceParam, _para)
 
   return {
     structure: structure.structure,
