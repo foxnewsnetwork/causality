@@ -1,5 +1,5 @@
 import { Graph, asIterator } from "./graph";
-import { Variable } from "./probability";
+import { Variable } from "./variable";
 import { map } from "./set";
 import { all } from "./iter";
 

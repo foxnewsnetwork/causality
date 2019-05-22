@@ -1,4 +1,5 @@
-import { Dependencies, Distribution, Variable } from './probability'
+import { Distribution } from './probability'
+import { Dependencies, Variable } from './variable'
 import { map, reduce, enumerate, isEmpty } from './set';
 import { reduce as mReduce, getWithDefault } from './map';
 import { random } from './integer';

@@ -1,11 +1,3 @@
-import { Showable } from './types'
-
-export type Variable<Value> = Showable & {
-  name: string,
-  domain: Set<Value>
-}
-export type Dependencies<Value> = Map<Variable<Value>["name"], Value>;
-
 export type Distribution<V> = Iterable<ProbabilityTableEntry<V>>
 
 export type ProbabilityTableEntry<Value> = {
