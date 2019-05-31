@@ -69,3 +69,76 @@ export function* zero(): Iterable<any> { }
 export function* lift0<T>(t: T): Iterable<T> {
   yield t
 }
+
+/**
+ * Given two lists like:
+ * 
+ * a = [1,2,3]
+ * b = ["a", "b", "c", "d"]
+ * 
+ * and a zip function that looks like:
+ * 
+ * zipFn = (a, b) => `${a}-${b}`
+ * 
+ * It will return an iterable that would yield out like
+ * 
+ * ['1-a', '2-b', '3-c']
+ * 
+ * Before terminating.
+ * 
+ * The resulting iterable will have the length of the
+ * which ever member is shorter
+ * 
+ * @param itA 
+ * @param itB 
+ * @param zipFn 
+ */
+export function* zipWith<A, B, C>(itA: Iterable<A>, itB: Iterable<B>, zipFn: (a: A, b: B) => C): Iterable<C> {
+  if (isEmpty(itA) || isEmpty(itB)) {
+    return
+  } else {
+    yield zipFn(first(itA), first(itB))
+    const restA = skip(itA, 1)
+    const restB = skip(itB, 1)
+    yield* zipWith(restA, restB, zipFn)
+  }
+}
+
+/**
+ * Due to limitations with typescript, iterables can't contain nulls
+ * @param it 
+ */
+export function first<T>(it: Iterable<T>): T {
+  let output;
+  for (const t of it) {
+    output = t;
+    break;
+  }
+  if (output != null) {
+    return output;
+  } else {
+    throw new Error('unexpected empty iterator')
+  }
+}
+
+export function* skip<T>(it: Iterable<T>, n: number): Iterable<T> {
+  let i = 0;
+  for (const t of it) {
+    if (i < n) {
+      i++
+    } else {
+      yield t
+    }
+  }
+}
+
+export function* drop<T>(it: Iterable<T>, n: number): Iterable<T> {
+  let i = 0
+  for (const t of it) {
+    if (i > n) {
+      yield t
+    } else {
+      i++
+    }
+  }
+}

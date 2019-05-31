@@ -28,8 +28,9 @@ export type CausalModel = {
  * to oranges
  * @param strA 
  * @param strB 
+ * @param confidence
  */
-export function isPreferred(strA: LatentStructure, strB: LatentStructure): boolean {
+export function isPreferred(strA: LatentStructure, strB: LatentStructure, confidence: number = 0.95): boolean {
   assert(
     isEqual(strA.observables, strB.observables),
     "Can't prefer models with different observables"
@@ -38,6 +39,8 @@ export function isPreferred(strA: LatentStructure, strB: LatentStructure): boole
   // Somehow implement that every `CausalModel` of `strA`
   // has a distribution that can be equivalent some
   // CausalModel of `strB`
+
+  
 }
 
 export function* genLinearCausalModels(struct: LatentStructure): Iterable<CausalModel> {
