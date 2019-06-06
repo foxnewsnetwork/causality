@@ -142,3 +142,9 @@ export function* drop<T>(it: Iterable<T>, n: number): Iterable<T> {
     }
   }
 }
+
+export function* range(start: number, finish: number, step: number = 1): Iterable<number> {
+  for(let i = start; i < finish; i += step) {
+    yield i
+  }
+}
