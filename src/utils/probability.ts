@@ -1,38 +1,31 @@
-import { range, map, reduce } from "./iter";
-import { over, mapValues } from "./map";
-
-export type DistributionTable<V> = Map<V, ProbabilityTableEntry<V>>
+import { intersect, diff } from "./set";
+import { map, all } from "./iter";
 
 /**
- * A distribution is a function that generates an unique event
- * V with some probability
+ * Probability tables are the core of any engineering
+ * enterprise that needs equality and stuff
  */
-export type Distribution<V> = () => V
-
-export type ProbabilityTableEntry<Value> = {
-  event: Value,
-  probability: Probability
-}
 
 // Number between 0 and 1
 export type Probability = number;
 
-export type ProbabilityTable<Value> = Map<Value, ProbabilityTableEntry<Value>>
+export type Table<A> = Map<A, Probability>
 
-export function equal<V>(distA: Distribution<V>, distB: Distribution<V>, threshold: number = 0.01) {
+export function equal<T>(tA: Table<T>, tB: Table<T>, threshold: number = 0.01): boolean {
+  const keysA = new Set(tA.keys())
+  const keysB = new Set(tB.keys())
+  const sharedKeys = intersect(keysA, keysB)
 
+  const _1 = map(sharedKeys, key => [tA.get(key), tB.get(key)])
+  const sharedProps = map(_1, ([vA = 0, vB = 0]) => Math.abs(vA - vB))
+
+  const aOnlyKeys = diff(keysA, keysB)
+  const aOnlyProps = map(aOnlyKeys, key => tA.get(key) || 0)
+
+  const bOnlyKeys = diff(keysB, keysA)
+  const bOnlyProps = map(bOnlyKeys, key => tB.get(key) || 0)
+
+  const isBelowThreshold = (n: number) => n < threshold
+  return all(sharedProps, isBelowThreshold) && all(aOnlyProps, isBelowThreshold) && all(bOnlyProps, isBelowThreshold)
 }
 
-/**
- * 
- * @param distFn 
- * @param n 
- */
-export function sample<V>(distFn: Distribution<V>, n: number = 100): DistributionTable<V> {
-  const weight = 1 / n;
-  const countUniq = (hashMap: Map<V, number>, v: V) => over(hashMap, v, (count = 0) => count + weight)
-  const _1 = range(0, n)
-  const _2 = map(_1, distFn)
-  const _3 = reduce(_2, countUniq, new Map())
-  return mapValues(_3, ([v, n]) => ({ event: v, probability: n }))
-}

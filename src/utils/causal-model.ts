@@ -3,7 +3,7 @@ import { assert } from "./misc";
 import { isEqual, map } from "./set";
 import { Parameterization, randomStochastic, randomLinearStructural, Equation } from "./equation";
 import { LatentStructure } from './latent-structure';
-import { Variable } from './probability';
+import { Variable } from './variable';
 import { reduce } from "./iter";
 import { mutSet } from './map';
 
