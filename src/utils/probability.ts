@@ -28,4 +28,3 @@ export function equal<T>(tA: Table<T>, tB: Table<T>, threshold: number = 0.01): 
   const isBelowThreshold = (n: number) => n < threshold
   return all(sharedProps, isBelowThreshold) && all(aOnlyProps, isBelowThreshold) && all(bOnlyProps, isBelowThreshold)
 }
-

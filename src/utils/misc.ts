@@ -1,18 +1,22 @@
 let _id = 0;
 
 export function guid(): string {
-  return `${Math.random()}-${now().toISOString()}-${_id++}`
+  return `${Math.random()}-${now().toISOString()}-${_id++}`;
 }
 
 export function now(): Date {
-  return new Date()
+  return new Date();
 }
 
-export function assert(shouldBeTrue: boolean, message: string, ...otherJunk: any[]): void {
+export function assert(
+  shouldBeTrue: boolean,
+  message: string,
+  ...otherJunk: any[]
+): void {
   if (shouldBeTrue) {
-    return
+    return;
   } else {
-    console.error(message, ...otherJunk)
-    throw new Error(message)
+    console.error(message, ...otherJunk);
+    throw new Error(message);
   }
 }
