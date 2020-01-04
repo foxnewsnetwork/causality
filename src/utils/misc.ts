@@ -12,11 +12,21 @@ export function assert(
   shouldBeTrue: boolean,
   message: string,
   ...otherJunk: any[]
-): void {
+): asserts shouldBeTrue is boolean {
   if (shouldBeTrue) {
     return;
   } else {
     console.error(message, ...otherJunk);
     throw new Error(message);
+  }
+}
+
+export function assertPresent<T>(
+  notNull: T
+): asserts notNull is NonNullable<T> {
+  if (notNull != null) {
+    return;
+  } else {
+    throw new Error('Null assertion failed')
   }
 }

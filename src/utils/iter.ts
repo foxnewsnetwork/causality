@@ -143,6 +143,29 @@ export function* drop<T>(it: Iterable<T>, n: number): Iterable<T> {
   }
 }
 
+export function* takeWhile<T>(it: Iterable<T>, condFn: (t: T) => boolean): Iterable<T> {
+  for (const t of it) {
+    if (condFn(t)) {
+      yield t;
+    } else {
+      continue;
+    }
+  }
+}
+
+export function* takeUntil<T>(
+  it: Iterable<T>,
+  condFn: (t: T) => boolean
+): Iterable<T> {
+  for (const t of it) {
+    if (condFn(t)) {
+      yield t;
+    } else {
+      break;
+    }
+  }
+}
+
 export function* range(start: number, finish: number, step: number = 1): Iterable<number> {
   for(let i = start; i < finish; i += step) {
     yield i

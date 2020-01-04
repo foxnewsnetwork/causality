@@ -1,5 +1,9 @@
 export class Variable {
   static domain: (seed?: number) => Iterable<Variable>;
+
+  static toString() {
+    return this.name
+  }
 }
 
 export type Dependencies = Map<typeof Variable, typeof Variable>;

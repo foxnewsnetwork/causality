@@ -38,7 +38,7 @@ export function remove<T>(sA: Set<T>, t: T): Set<T> {
 }
 
 export function lift0<T>(t: T): Set<T> {
-  const out = new Set()
+  const out = new Set<T>()
   out.add(t)
   return out
 }
