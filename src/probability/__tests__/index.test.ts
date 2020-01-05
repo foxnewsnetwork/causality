@@ -1,4 +1,5 @@
 import { sample, Probability } from "..";
+import { mutOver, get } from '../../utils/map';
 
 enum SmokingGene {
   YES = "YES",
@@ -17,14 +18,14 @@ describe("probability/index.ts", () => {
       [SmokingGene.YES, 0],
       [SmokingGene.NO, 0]
     ]);
-    
+
     for (let i = 0; i < RUN_COUNT; i++) {
       const variable = sample(distribution);
-      countMap.set(variable, countMap.get(variable) + 1);
+      mutOver(countMap, variable, (n = 0) => n + 1)
     }
 
-    const yesRatio = countMap.get(SmokingGene.YES) / RUN_COUNT;
-    const noRatio = countMap.get(SmokingGene.NO) / RUN_COUNT;
+    const yesRatio = get(countMap, SmokingGene.YES) / RUN_COUNT;
+    const noRatio = get(countMap, SmokingGene.NO) / RUN_COUNT;
     test("the generated ratio should approx match the distribution", () => {
       expect(yesRatio).toBeCloseTo(0.25);
       expect(noRatio).toBeCloseTo(0.75);

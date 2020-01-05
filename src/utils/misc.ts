@@ -12,7 +12,7 @@ export function assert(
   shouldBeTrue: boolean,
   message: string,
   ...otherJunk: any[]
-): asserts shouldBeTrue is boolean {
+): void /* asserts shouldBeTrue is boolean */ {
   if (shouldBeTrue) {
     return;
   } else {
@@ -23,7 +23,7 @@ export function assert(
 
 export function assertPresent<T>(
   notNull: T
-): asserts notNull is NonNullable<T> {
+): void /* asserts notNull is NonNullable<T> */ {
   if (notNull != null) {
     return;
   } else {

@@ -52,6 +52,10 @@ export function over<K, V>(record: Map<K, V>, key: K, mapFn: (v?: V) => V): Map<
   return set(record, key, mapFn(record.get(key)))
 }
 
+export function mutOver<K, V>(record: Map<K, V>, key: K, mapFn: (v?: V) => V): Map<K, V> {
+  return mutSet(record, key, mapFn(record.get(key)))
+}
+
 export function mapValues<K, V, V2>(mapObj: Map<K, V>, mapFn: (x: T2<K, V>) => V2): Map<K, V2> {
   let output = new Map();
   for (const [key, val] of mapObj) {
