@@ -67,6 +67,14 @@ const equations = new Map<typeof Variable, Equation>([
   [Smoke, (d: Smoke, parents) => parents.get(Gene) === Gene.SMOKING ? smokesGivenSmokingGene(d) : smokesGivenHealthyGene(d)],
   [Tar, (d: Tar, parents) => parents.get(Smoke) === Smoke.IS_SMOKER ? tarGivenSmoker(d) : tarGivenNonSmoker(d)],
   [Cancer, (d: Cancer, parents) => {
+    const tar = parents.get(Tar);
+    const gene = parents.get(Gene);
+    if (tar == null) {
+      throw new Error('Bad tar parent')
+    }
+    if (gene == null) {
+      throw new Error('Bad geen parent')
+    }
     if (parents.get(Tar) === Tar.DIRTY) {
       if (parents.get(Gene) === Gene.SMOKING) {
         return Cancer.METASTATIC;
@@ -130,10 +138,13 @@ describe('model/index.ts', () => {
       } else {
         dirtyTar++
       }
-      if (Cancer.METASTATIC === get(data, Cancer)) {
+      const cancer = get(data, Cancer)
+      if (Cancer.METASTATIC === cancer) {
         yesCancer++
-      } else {
+      } else if (cancer === Cancer.NONE) {
         noCancer++
+      } else {
+        throw new Error('Bad Cancer value')
       }
       if (Smoke.IS_SMOKER === get(data, Smoke)) {
         yesSmoker++
@@ -141,27 +152,28 @@ describe('model/index.ts', () => {
         noSmoker++
       }
     }
-    console.warn(
-      "===== smokers:non-smoker is: ",
-      `${yesSmoker}/${noSmoker}\n`,
-      "===== cancer:non-cancer is: ",
-      `${yesCancer}/${noCancer}\n`,
-      "===== tar:non-tar is: ",
-      `${cleanTar}/${dirtyTar}\n`,
-      "===== good gene:smoke gene is: ",
-      `${goodGene}/${smokeGene}\n`
-    );
+    // console.warn(
+    //   "===== smokers:non-smoker is: ",
+    //   `${yesSmoker}/${noSmoker}\n`,
+    //   "===== cancer:non-cancer is: ",
+    //   `${yesCancer}/${noCancer}\n`,
+    //   "===== tar:non-tar is: ",
+    //   `${cleanTar}/${dirtyTar}\n`,
+    //   "===== good gene:smoke gene is: ",
+    //   `${goodGene}/${smokeGene}\n`
+    // );
     test('the ratio of smoking to non-smoking gene should be ~1:1', () => {
       expect(smokeGene / goodGene).toBeCloseTo(1, 1)
     })
     test("~55% of the total population should be smokers", () => {
-      expect(yesSmoker / SAMPLE_SIZE).toBeCloseTo(0.55);
+      expect(yesSmoker / SAMPLE_SIZE).toBeCloseTo(0.55, 1);
     });
-    test('the ratio of tar to no tar should be close to 4:1', () => {
-      expect(cleanTar / dirtyTar).toBeCloseTo(4, 1);
+    test('~64% of the total population should have tar', () => {
+      expect(dirtyTar / SAMPLE_SIZE).toBeCloseTo(0.64, 1);
+      expect(cleanTar / SAMPLE_SIZE).toBeCloseTo(0.36, 1);
     })
-    test("the ratio of cancer should be close to 99:1", () => {
-      expect(noCancer / yesCancer).toBeCloseTo(99, 1);
+    test("~32.5% of the total population should have cancer", () => {
+      expect(yesCancer / SAMPLE_SIZE).toBeCloseTo(0.325, 1);
     });
     
   })
