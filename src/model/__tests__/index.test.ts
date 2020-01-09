@@ -108,21 +108,61 @@ describe('model/index.ts', () => {
       expect(row.size).toEqual(4)
     })
   })
-
-  describe('function runModel', () => {
-    const SAMPLE_SIZE = 500;
+  describe('when smoking gene confounds smoking and cancer, mediated by tar', () => {
+    const SAMPLE_SIZE = 5000;
     const dataStream = runModel(model);
     let smokeGene = 0;
     let goodGene = 0;
+    let cleanTar = 0;
+    let dirtyTar = 0;
+    let yesSmoker = 0;
+    let noSmoker = 0;
+    let yesCancer = 0;
+    let noCancer = 0;
     for (const data of take(dataStream, SAMPLE_SIZE)) {
       if (Gene.SMOKING === get(data, Gene)) {
-        smokeGene += 1
+        smokeGene++
       } else {
-        goodGene += 1
+        goodGene++
+      }
+      if (Tar.CLEAN === get(data, Tar)) {
+        cleanTar++
+      } else {
+        dirtyTar++
+      }
+      if (Cancer.METASTATIC === get(data, Cancer)) {
+        yesCancer++
+      } else {
+        noCancer++
+      }
+      if (Smoke.IS_SMOKER === get(data, Smoke)) {
+        yesSmoker++
+      } else {
+        noSmoker++
       }
     }
-    test('the ratio of smoking to non-smoking gene should match', () => {
+    console.warn(
+      "===== smokers:non-smoker is: ",
+      `${yesSmoker}/${noSmoker}\n`,
+      "===== cancer:non-cancer is: ",
+      `${yesCancer}/${noCancer}\n`,
+      "===== tar:non-tar is: ",
+      `${cleanTar}/${dirtyTar}\n`,
+      "===== good gene:smoke gene is: ",
+      `${goodGene}/${smokeGene}\n`
+    );
+    test('the ratio of smoking to non-smoking gene should be ~1:1', () => {
       expect(smokeGene / goodGene).toBeCloseTo(1, 1)
     })
+    test("~55% of the total population should be smokers", () => {
+      expect(yesSmoker / SAMPLE_SIZE).toBeCloseTo(0.55);
+    });
+    test('the ratio of tar to no tar should be close to 4:1', () => {
+      expect(cleanTar / dirtyTar).toBeCloseTo(4, 1);
+    })
+    test("the ratio of cancer should be close to 99:1", () => {
+      expect(noCancer / yesCancer).toBeCloseTo(99, 1);
+    });
+    
   })
 })
