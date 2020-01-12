@@ -54,17 +54,19 @@ export function* runModel(model: CausalModel): Iterable<Map<typeof Variable, Var
  * @param model 
  */
 export function sample(model: CausalModel): Map<typeof Variable, Variable> {
-  const dataTable = reduce(model.parametrization.disturbances, (table, [VarKlass, probMeasure]) => {
+  const disturbedTable = reduce(model.parametrization.disturbances, (table, [VarKlass, probMeasure]) => {
     const distribution: Distribution = map(VarKlass.domain(), iVar => [iVar, probMeasure(iVar)])
     return mutSet(table, VarKlass, sampleDistribution(distribution))
   }, new Map<typeof Variable, Variable>())
+
+  const dataTable = new Map<typeof Variable, Variable>();
 
   let unsolvedEquations = clone(model.parametrization.equations);
   while (unsolvedEquations.size > 0) {
     const solvedEqs = new Set<typeof Variable>();
     for (const [VarKlass, equation] of unsolvedEquations) {
       if (isSolvable(model.dag, dataTable, VarKlass)) {
-        const disturbance = get(dataTable, VarKlass);
+        const disturbance = get(disturbedTable, VarKlass);
         mutSet(dataTable, VarKlass, equation(disturbance, dataTable))
         solvedEqs.add(VarKlass);
       }

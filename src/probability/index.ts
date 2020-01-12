@@ -34,16 +34,18 @@ export type Equation<VarClass = typeof Variable, V = Variable> = (disturbance: V
 export function sample<V = Variable>(distribution: Distribution<V>): V {
   let position = 0;
   const vRange = map(distribution, ([variable, prob]) => {
+    const start = position;
+    position += prob;
     return {
       variable,
-      start: position,
-      finish: position += prob
+      start,
+      finish: position
     };
   });
   const seed = Math.random();
 
   for (const { start, finish, variable } of vRange) {
-    if (start <= seed && seed < finish) {
+    if (start < seed && seed <= finish) {
       return variable;
     }
   }
