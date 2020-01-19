@@ -7,6 +7,8 @@ import { map } from "../utils/iter";
  */
 export { Variable };
 
+export { inferProbability } from './query';
+
 // Number between 0 and 1
 export type Probability = number;
 
@@ -50,16 +52,4 @@ export function sample<V = Variable>(distribution: Distribution<V>): V {
     }
   }
   throw new Error("Empty Distribution");
-}
-
-export type Query<VC=typeof Variable, V = Variable> = {
-  events: Array<{
-    VarClass: VC,
-    value: V
-  }>,
-  given: Array<{
-    VarClass: VC,
-    value: V,
-    isDo?: boolean
-  }>
 }
