@@ -1,3 +1,8 @@
+export type VarClass<V = Variable> = {
+  domain: (seed?: number) => Iterable<V>
+  toString: () => string
+}
+
 export class Variable {
   static domain: (seed?: number) => Iterable<Variable>;
 

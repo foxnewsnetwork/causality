@@ -2,15 +2,16 @@ import { Graph, getParents } from "../utils/graph";
 import { Variable, Measure, Equation, sample as sampleDistribution, Distribution } from '../probability';
 import { get, reduce, mutSet, clone } from "../utils/map";
 import { map, all } from "../utils/iter";
+import { VarClass } from "../probability/variable";
 
 /**
  * This is defintion 2.2.2 on page 44 of the causality book
  */
-export type CausalModel = {
-  dag: Graph<typeof Variable>,
+export type CausalModel<V = Variable> = {
+  dag: Graph<VarClass<V>>,
   parametrization: {
-    equations: Map<typeof Variable, Equation>,
-    disturbances: Map<typeof Variable, Measure>
+    equations: Map<VarClass<V>, Equation<V>>,
+    disturbances: Map<VarClass<V>, Measure<V>>
   }
 }
 
@@ -41,7 +42,7 @@ export type CausalModel = {
  * onwards to infinity
  * @param model 
  */
-export function* runModel(model: CausalModel): Iterable<Map<typeof Variable, Variable>> {
+export function* runModel<V = Variable>(model: CausalModel<V>): Iterable<Map<VarClass<V>, V>> {
   while (true) {
     yield sample(model);
   }
@@ -53,17 +54,20 @@ export function* runModel(model: CausalModel): Iterable<Map<typeof Variable, Var
  * actual value of an variable
  * @param model 
  */
-export function sample(model: CausalModel): Map<typeof Variable, Variable> {
-  const disturbedTable = reduce(model.parametrization.disturbances, (table, [VarKlass, probMeasure]) => {
-    const distribution: Distribution = map(VarKlass.domain(), iVar => [iVar, probMeasure(iVar)])
-    return mutSet(table, VarKlass, sampleDistribution(distribution))
-  }, new Map<typeof Variable, Variable>())
+export function sample<V = Variable>(model: CausalModel<V>): Map<VarClass<V>, V> {
+  const disturbedTable: Map<VarClass<V>, V> = reduce(
+    model.parametrization.disturbances,
+    (table, [VarKlass, probMeasure]) => {
+      const distribution: Distribution = map(VarKlass.domain(), iVar => [iVar, probMeasure(iVar)])
+      return mutSet(table, VarKlass, sampleDistribution(distribution))
+    }, new Map()
+  )
 
-  const dataTable = new Map<typeof Variable, Variable>();
+  const dataTable = new Map<VarClass<V>, V>();
 
   let unsolvedEquations = clone(model.parametrization.equations);
   while (unsolvedEquations.size > 0) {
-    const solvedEqs = new Set<typeof Variable>();
+    const solvedEqs = new Set<VarClass<V>>();
     for (const [VarKlass, equation] of unsolvedEquations) {
       if (isSolvable(model.dag, dataTable, VarKlass)) {
         const disturbance = get(disturbedTable, VarKlass);

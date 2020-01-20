@@ -1,4 +1,4 @@
-import { Variable } from "./variable";
+import { Variable, VarClass } from "./variable";
 import { map } from "../utils/iter";
 
 /**
@@ -14,7 +14,7 @@ export type Probability = number;
 
 export type Distribution<V = Variable> = Iterable<[V, Probability]>
 
-export type Dependencies = Map<typeof Variable, typeof Variable>;
+export type Dependencies<V> = Map<VarClass<V>, VarClass<V>>;
 /**
  * The `measure` is a way to assign size to
  * members of a set
@@ -27,7 +27,7 @@ export type Dependencies = Map<typeof Variable, typeof Variable>;
  */
 export type Measure<V = Variable> = (v: V) => Probability
 
-export type Equation<VarClass = typeof Variable, V = Variable> = (disturbance: V, parents: Map<VarClass, V>) => V;
+export type Equation<V = Variable> = (disturbance: V, parents: Map<VarClass<V>, V>) => V;
 
 /**
  * Samples a probability distribution
