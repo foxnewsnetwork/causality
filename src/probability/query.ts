@@ -1,18 +1,31 @@
-import { Variable } from "./variable";
-import { all, filter } from "../utils/iter";
+import { Variable, VarClass } from "./variable";
+import { all, filter, any, map } from "../utils/iter";
+import { Probability } from ".";
+import { union } from "../utils/set";
 
-export type Query<VC = typeof Variable, V = Variable> = {
-  events: Array<{
-    VarClass: VC,
-    value: V
-  }>,
-  given: Array<{
-    VarClass: VC,
-    value: V
-  }>
+export type SeeEvent<V> = {
+  VarClass: VarClass<V>,
+  value: V
 }
 
-export function inferProbability<VC = typeof Variable, V = Variable>(dataTable: Iterable<Map<VC, V>>, query: Query<VC, V>): Probability {
+export type DoEvent<V> = SeeEvent<V> & {
+  isDo: true
+}
+
+export function isDoEvent(event: DoEvent<any> | SeeEvent<any>): event is DoEvent<any> {
+  return (event as DoEvent<any>).isDo;
+}
+
+export type Query<V = Variable> = {
+  events: Iterable<SeeEvent<V>>,
+  given: Iterable<SeeEvent<V> | DoEvent<V>>
+}
+
+export function isDoQuery(query: Query<any>): boolean {
+  return any(query.given, isDoEvent)
+}
+
+export function inferProbability<V = Variable>(dataTable: Iterable<Map<VarClass<V>, V>>, query: Query<V>): Probability {
   const conditionedDataTable = filter(dataTable, entry => entryMatches(entry, query.given));
   let totalCount = 0;
   let trueCount = 0;
@@ -25,6 +38,13 @@ export function inferProbability<VC = typeof Variable, V = Variable>(dataTable: 
   return trueCount / totalCount;
 }
 
-function entryMatches<VC, V>(entry: Map<VC, V>, jointEvents: Array<{ VarClass: VC, value: V }>): boolean {
+function entryMatches<V>(entry: Map<VarClass<V>, V>, jointEvents: Iterable<SeeEvent<V>>): boolean {
   return all(jointEvents, ({ VarClass, value }) => entry.has(VarClass) && entry.get(VarClass) === value);
+}
+
+export function getQueryDependencies<V = Variable>(query: Query<V>): Set<VarClass<V>> {
+  const topDeps = map(query.events, ({ VarClass }) => VarClass)
+  const botDeps = map(query.given, ({ VarClass }) => VarClass)
+
+  return union(new Set(topDeps), new Set(botDeps))
 }

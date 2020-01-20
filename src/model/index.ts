@@ -21,14 +21,6 @@ export type CausalModel<V = Variable> = {
  * 
  * P(events | conditions)
  */
-// type Query = {
-//   events: Set<Variable>,
-//   conditions: Set<Variable>
-// }
-
-// export function query(model: CausalModel, query: Query): Probability {
-
-// }
 
 /**
  * Takes a causal model and generates data for it.
