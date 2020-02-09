@@ -1,7 +1,7 @@
-import { getWithDefault, over } from './map';
+import { getWithDefault, over, mapValues } from './map';
 import { guid } from './misc';
 import { filter as iFilter, map as iMap } from './iter';
-import { empty, isMember, add, union, isEmpty, lift0, flatMap } from './set';
+import { empty, isMember, add, union, isEmpty, lift0, flatMap, remove } from './set';
 import { cache2, CachedOutput2 } from './func';
 import { Showable } from './types';
 
@@ -48,6 +48,46 @@ export function connect<Sh>(g: Graph<Sh>, parent: Sh, child: Sh): Graph<Sh> {
   })
   bustCache(g, child)
   const parent2children = over(_parent2children, child, (grandchildren = empty()) => grandchildren)
+  return {
+    ...g,
+    parent2children
+  }
+}
+
+/**
+ * Returns a graph where nothing "goes into" X,
+ * 
+ * That is, if Y -> X, we will return a graph where
+ * Y no longer goes into X
+ * 
+ */
+export function disownParents<X>(g: Graph<X>, x: X): Graph<X> {
+  const parentsOfX = getParents(g, x);
+
+  const parent2children = mapValues(g.parent2children, ([parent, children]) => {
+    if (isMember(parentsOfX, parent)) {
+      return remove(children, x)
+    } else {
+      return children;
+    }
+  })
+
+  bustCache(g, x);
+
+  return {
+    ...g,
+    parent2children
+  }
+}
+
+export function disownChildren<X>(g: Graph<X>, x: X): Graph<X> {
+  const parent2children = over(g.parent2children, x, (children = empty()) => {
+    for (const child of children) {
+      bustCache(g, child);
+    }
+    return empty();
+  });
+
   return {
     ...g,
     parent2children
