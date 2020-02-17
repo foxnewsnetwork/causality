@@ -9,7 +9,7 @@ import {
 import {
   create, MailServer, getMail, spamMail, spamBulkMail
 } from './mail-server';
-import { filter, any, has, map } from './iter';
+import { filter, any, has } from './iter';
 
 /**
  * Is there a path between two points on a graph given a set of
