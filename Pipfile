@@ -4,11 +4,13 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
+pytest = "*"
 
 [packages]
 numpy = "*"
 opencv-python = "*"
 pyautogui = "*"
+scikit-image = "*"
 
 [requires]
 python_version = "3.6"
