@@ -3,6 +3,7 @@ import { Container } from '@material-ui/core';
 import useSuspense from 'hooks/use-suspense';
 import Loading from 'components/Loading';
 import StreamVideo from 'components/StreamVideo';
+import './style.css';
 
 const screenMedia = () => (
   navigator.mediaDevices.getDisplayMedia({ audio: false, video: true })
@@ -28,9 +29,7 @@ const VideoEcho = () => {
 
 const Home = () => {
   return (
-    <main>
-      <p>App Spacer</p>
-      <p>App Spacer</p>
+    <main className="home">
       <Container>
         <VideoEcho />
       </Container>

@@ -1,8 +1,9 @@
-import { useRef, useCallback, useEffect } from 'react';
+import { useCallback } from 'react';
 
 type Suspender<T> = {
   read(): T;
   rerun(): void;
+  purge(): void;
 }
 
 enum Status {
@@ -57,5 +58,9 @@ export default function useSuspense<T>(asyncFn: () => Promise<T>): Suspender<T> 
     }
   }, [state.status])
 
-  return { read, rerun };
+  const purge = useCallback(() => {
+    refMap.delete(asyncFn);
+  }, [asyncFn])
+
+  return { read, rerun, purge };
 }
