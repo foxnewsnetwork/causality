@@ -1,27 +1,26 @@
 import React from 'react';
-import logo from './logo.svg';
 import { RouteMap, Routes } from 'App/routes';
 import { map } from 'utils/iter';
 import { Link } from 'react-router-dom';
+import { AppBar, Toolbar, Button } from '@material-ui/core';
 
 const RouteLink = ([path, name]: [Routes, string]) => {
   return (
-    <li>
-      <Link to={path}>{name}</Link>
-    </li>
+    <Link to={path} key={name}>
+      <Button>
+        {name}
+      </Button>
+    </Link>
   )
 }
 
 const Header = () => {
   return (
-    <header className="App-header">
-      <img src={logo} className="App-logo" alt="logo" />
-      <nav>
-        <ul>
-          {map(RouteMap, RouteLink)}
-        </ul>
-      </nav>
-    </header>
+    <AppBar position="absolute">
+      <Toolbar>
+        {[...map(RouteMap, RouteLink)]}
+      </Toolbar>
+    </AppBar>
   )
 }
 

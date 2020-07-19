@@ -22,7 +22,7 @@ function _hashParents(g: Graph<Showable>, child: Showable): string {
 type _P0 = Parameters<GetParents>[0]
 type _P1 = Parameters<GetParents>[1]
 type _R0 = ReturnType<GetParents>
-const cached: CachedOutput2<_P0, _P1, _R0> = cache2(_getParents, _hashParents);
+const cached = cache2(_getParents, _hashParents) as CachedOutput2<_P0, _P1, _R0>;
 export const getParents = cached.cachedFn as GetParents;
 const bustCache = cached.bustFn
 

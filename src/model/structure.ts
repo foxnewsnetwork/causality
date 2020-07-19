@@ -47,6 +47,7 @@ export function isIdentifiable<V = Variable>(structure: LatentStructure<V>, quer
     return isMember(structure.observables, seeY.VarClass) && isMember(structure.observables, seeX.VarClass)
   }
 
-  const blockers = blockingSet(graph, seeX.VarClass, seeY.VarClass);
+  // const blockers = blockingSet(graph, seeX.VarClass, seeY.VarClass);
   // TODO: continue this, probably rename to `ClosedForm`
+  return false;
 }
