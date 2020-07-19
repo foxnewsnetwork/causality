@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import './style.css';
 
 type Props = {
   stream: MediaStream;
@@ -10,12 +11,13 @@ export default function StreamVideo(props: Props) {
 
   useEffect(() => {
     if (vRef?.current != null) {
-      vRef.current.srcObject = props.stream
+      vRef.current.srcObject = props.stream;
+      vRef.current.play();
     }
   }, [vRef?.current]);
 
   return (
-    <video ref={vRef}>
+    <video className="stream-video" ref={vRef}>
       {props.children}
     </video>
   )
