@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, createContext, useCallback, useMemo } from 'react';
 import './style.css';
-import { reject } from 'ramda';
+
 
 type Props = {
   stream: MediaStream;
@@ -11,8 +11,10 @@ type API = {
   takePicture(): Promise<Blob>;
 }
 const ApiCtx: React.Context<API> = createContext({
-  takePicture: () => Promise.reject(new Error("not ready"));
+  takePicture: () => Promise.reject(new Error("not ready"))
 })
+
+export { ApiCtx as StreamVideoContext }
 
 export default function StreamVideo(props: Props) {
   const vRef: React.RefObject<HTMLVideoElement> = useRef(null);
@@ -53,11 +55,10 @@ export default function StreamVideo(props: Props) {
   return (
     <>
       <canvas className="stream-video-canvas" ref={cRef} />
-      <video className="stream-video" ref={vRef}>
-        <ApiCtx.Provider value={api}>
-          {props.children}
-        </ApiCtx.Provider>
-      </video>
+      <video className="stream-video" ref={vRef} />
+      <ApiCtx.Provider value={api}>
+        {props.children}
+      </ApiCtx.Provider>
     </>
   )
 }
