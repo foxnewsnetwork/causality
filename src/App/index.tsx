@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import './App.css';
 import NavHeader from './NavHeader';
 import NavMain from './NavMain';
 import { BrowserRouter } from 'react-router-dom';
