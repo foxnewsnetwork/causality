@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
-import tfvis from '@tensorflow/tfjs-vis';
-import type { Sequential } from '@tensorflow/tfjs';
+import { show } from '@tensorflow/tfjs-vis';
 import { Button } from '@material-ui/core';
+import { Sequential } from '@tensorflow/tfjs';
 
 type Props = {
   model?: Sequential
@@ -19,7 +19,7 @@ const ModelViewer = (props: Props) => {
 
   const showModel = useCallback(() => {
     if (props.model != null) {
-      tfvis.show.modelSummary({ name: "modelSummary" }, props.model)
+      show.modelSummary({ name: "Model Summary" }, props.model)
     }
   }, [props.model])
 

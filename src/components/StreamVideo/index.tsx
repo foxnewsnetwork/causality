@@ -14,6 +14,8 @@ const ApiCtx: React.Context<API> = createContext({
   takePicture: () => Promise.reject(new Error("not ready"))
 })
 
+const Provider = (ApiCtx.Provider as unknown as React.ComponentClass<{ value: API }>);
+
 export { ApiCtx as StreamVideoContext }
 
 export default function StreamVideo(props: Props) {
@@ -56,9 +58,9 @@ export default function StreamVideo(props: Props) {
     <>
       <canvas className="stream-video-canvas" ref={cRef} />
       <video className="stream-video" ref={vRef} />
-      <ApiCtx.Provider value={api}>
+      <Provider value={api}>
         {props.children}
-      </ApiCtx.Provider>
+      </Provider>
     </>
   )
 }

@@ -1,11 +1,10 @@
 import React, { useMemo, useCallback } from 'react';
-import tf from '@tensorflow/tfjs';
-import type { Sequential } from '@tensorflow/tfjs';
+import * as tf from '@tensorflow/tfjs';
 import { Button } from '@material-ui/core';
 
 type Props = {
-  model?: Sequential,
-  updateModel: (m: Sequential) => void
+  model?: tf.Sequential,
+  updateModel: (m: tf.Sequential) => void
 }
 
 const ModelBuilder = (props: Props) => {

@@ -5,6 +5,8 @@ import StreamVideo, { StreamVideoContext } from 'components/StreamVideo';
 import { Props } from './type';
 import PictureEcho from 'components/PictureEcho';
 
+const Suspense = (React.Suspense as unknown as React.ComponentClass<any>)
+
 const screenMedia = () => (
   navigator.mediaDevices.getDisplayMedia({ audio: false, video: true })
 )
@@ -27,11 +29,11 @@ const EchoStream = (props: Props) => {
 
 const VideoEcho = (props: Props) => {
   return (
-    <React.Suspense fallback={<Loading />}>
+    <Suspense fallback={<Loading />}>
       <EchoStream>
         {props.children}
       </EchoStream>
-    </React.Suspense>
+    </Suspense>
   )
 }
 
