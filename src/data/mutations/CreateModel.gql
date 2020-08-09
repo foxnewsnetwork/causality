@@ -1,0 +1,10 @@
+input ModelInput {
+  name: String!
+}
+
+mutation CreateModel($model: ModelInput) {
+  createModel(model: $model) {
+    id
+    name
+  }
+}

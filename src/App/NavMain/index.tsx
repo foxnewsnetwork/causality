@@ -6,6 +6,7 @@ import {
 } from "react-router-dom";
 import SandboxVideo from 'App/SandboxVideo';
 import SandboxTensorFlow from 'App/SandboxTensorFlow';
+import ModelHub from 'App/ModelHub';
 import "./style.css";
 
 const NavMain = () => {
@@ -17,6 +18,9 @@ const NavMain = () => {
         </Route>
         <Route name={Routes.SANDBOX_VIDEO}>
           <SandboxVideo />
+        </Route>
+        <Route name={Routes.MODEL_HUB}>
+          <ModelHub />
         </Route>
       </Switch>
     </main>

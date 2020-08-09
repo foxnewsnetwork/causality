@@ -1,0 +1,9 @@
+type Label {
+  value: String!
+}
+
+type Model {
+  id: String!
+  name: String!
+  labels: [Label!]!
+}

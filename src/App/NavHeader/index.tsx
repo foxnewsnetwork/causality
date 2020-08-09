@@ -1,6 +1,6 @@
 import React from 'react';
 import { RouteMap, Routes } from 'App/routes';
-import { map } from 'utils/iter';
+import { map } from 'lib/utils/iter';
 import { Link } from 'react-router-dom';
 import { AppBar, Toolbar, Button } from '@material-ui/core';
 
