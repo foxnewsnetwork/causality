@@ -8,6 +8,7 @@ import SandboxVideo from 'App/SandboxVideo';
 import SandboxTensorFlow from 'App/SandboxTensorFlow';
 import ModelHub from 'App/ModelHub';
 import "./style.css";
+import SandboxApollo from 'App/SandboxApollo';
 
 const NavMain = () => {
   return (
@@ -21,6 +22,9 @@ const NavMain = () => {
         </Route>
         <Route name={Routes.MODEL_HUB}>
           <ModelHub />
+        </Route>
+        <Route name={Routes.SANDBOX_APOLLO}>
+          <SandboxApollo />
         </Route>
       </Switch>
     </main>

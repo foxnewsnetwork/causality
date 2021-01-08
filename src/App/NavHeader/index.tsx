@@ -6,6 +6,7 @@ import { AppBar, Toolbar, Button } from '@material-ui/core';
 
 const RouteLink = ([path, name]: [Routes, string]) => {
   return (
+    // @ts-ignore
     <Link to={path} key={name}>
       <Button>
         {name}
