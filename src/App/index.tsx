@@ -9,12 +9,12 @@ class App extends Component {
     return (
       <div className="App">
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
-        <CausalityDataProvider>
-          <BrowserRouter>
-            <NavHeader />
+        <BrowserRouter>
+          <NavHeader />
+          <CausalityDataProvider>
             <NavMain />
-          </BrowserRouter>
-        </CausalityDataProvider>
+          </CausalityDataProvider>
+        </BrowserRouter>
       </div>
     );
   }

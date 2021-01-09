@@ -1,12 +1,22 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import { CreateModel } from 'data/mutations/CreateModel.graphql';
+import gql from 'graphql-tag';
+import { Container } from '@material-ui/core';
+
+const CreateModel = gql`
+  query HelloWorld {
+    dogs {
+      id
+      type
+    }
+  }
+`
 
 /**
  * See apollo graph-ql usage docs and examples here:
  * https://www.apollographql.com/docs/react/data/queries/
  */
-export default function SandboxApollo() {
+function SandboxApollo() {
   const {
     loading,
     error,
@@ -27,7 +37,16 @@ export default function SandboxApollo() {
   }
   return (
     <div>
+      <p>Hello Sandbox Apollo</p>
       <p>{JSON.stringify(data)}</p>
     </div>
+  )
+}
+
+export default function WrappedSandbox() {
+  return (
+    <Container>
+      <SandboxApollo />
+    </Container>
   )
 }

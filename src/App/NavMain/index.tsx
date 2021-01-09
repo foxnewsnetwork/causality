@@ -14,17 +14,25 @@ const NavMain = () => {
   return (
     <main className="nav-main">
       <Switch>
-        <Route name={Routes.SANDBOX_TENSORFLOW}>
+        <Route path={Routes.HOME}>
+          <h2>Home:path</h2>
+          <SandboxApollo />
+        </Route>
+        <Route path={Routes.SANDBOX_TENSORFLOW}>
+          <h2>Tensor Flow</h2>
           <SandboxTensorFlow />
         </Route>
-        <Route name={Routes.SANDBOX_VIDEO}>
+        <Route path={Routes.SANDBOX_VIDEO}>
+          <h2>Video</h2>
           <SandboxVideo />
         </Route>
-        <Route name={Routes.MODEL_HUB}>
+        <Route path={Routes.MODEL_HUB}>
+          <h2>Model</h2>
           <ModelHub />
         </Route>
-        <Route name={Routes.SANDBOX_APOLLO}>
-          <SandboxApollo />
+        <Route path={Routes.SANDBOX_APOLLO}>
+          <h2>Apollo</h2>
+
         </Route>
       </Switch>
     </main>

@@ -5,6 +5,7 @@ import client from './client'
 
 export default function CausalityDataProvider(props: { children: ReactNode }) {
   return (
+    // @ts-ignore
     <ApolloProvider client={client}>
       {props.children}
     </ApolloProvider>

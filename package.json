@@ -50,5 +50,6 @@
     "@babel/plugin-syntax-jsx": "^7.12.1",
     "babel-plugin-import-graphql": "^2.8.1",
     "patch-package": "^6.2.2"
-  }
+  },
+  "proxy": "http://localhost:5555"
 }

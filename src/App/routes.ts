@@ -1,4 +1,5 @@
 export enum Routes {
+  HOME = "/",
   SANDBOX_TENSORFLOW = "/sandbox-tensorflow",
   SANDBOX_VIDEO = "/sandbox-video",
   MODEL_HUB = "/model-hub",
@@ -6,6 +7,7 @@ export enum Routes {
 }
 
 function* _routeMap(): Generator<[Routes, string]> {
+  yield [Routes.HOME, 'home']
   yield [Routes.SANDBOX_TENSORFLOW, 'sandbox tensorflow']
   yield [Routes.SANDBOX_VIDEO, 'sandbox video']
   yield [Routes.MODEL_HUB, 'model hub']

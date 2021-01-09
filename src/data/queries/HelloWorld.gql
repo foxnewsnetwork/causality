@@ -1,0 +1,6 @@
+query HelloWorld {
+  dogs {
+    id
+    breed
+  }
+}
