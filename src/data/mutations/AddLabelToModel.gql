@@ -1,8 +1,0 @@
-input LabelInput {
-  value: String!
-  modelId: String!
-}
-
-mutation AddLabelToModel($label: LabelInput) {
-  addLabelToModel(label: $label)
-}

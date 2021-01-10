@@ -1,7 +1,7 @@
 import { ApolloClient, InMemoryCache } from '@apollo/client';
 
 const URI_MAP = {
-  development: 'http://localhost:5555',
+  development: '/api',
   test: 'tbd',
   production: 'tbd',
 };

@@ -14,10 +14,6 @@ const NavMain = () => {
   return (
     <main className="nav-main">
       <Switch>
-        <Route path={Routes.HOME}>
-          <h2>Home:path</h2>
-          <SandboxApollo />
-        </Route>
         <Route path={Routes.SANDBOX_TENSORFLOW}>
           <h2>Tensor Flow</h2>
           <SandboxTensorFlow />
@@ -32,7 +28,11 @@ const NavMain = () => {
         </Route>
         <Route path={Routes.SANDBOX_APOLLO}>
           <h2>Apollo</h2>
-
+          <SandboxApollo />
+        </Route>
+        {/** Default home route _must_ come last as the "/" matches everything */}
+        <Route path={Routes.HOME}>
+          <h2>Home:path</h2>
         </Route>
       </Switch>
     </main>

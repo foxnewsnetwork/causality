@@ -1,16 +1,7 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import gql from 'graphql-tag';
+import { HelloWorld } from 'data/queries/HelloWorld';
 import { Container } from '@material-ui/core';
-
-const CreateModel = gql`
-  query HelloWorld {
-    dogs {
-      id
-      type
-    }
-  }
-`
 
 /**
  * See apollo graph-ql usage docs and examples here:
@@ -21,7 +12,7 @@ function SandboxApollo() {
     loading,
     error,
     data,
-  } = useQuery(CreateModel);
+  } = useQuery(HelloWorld);
   if (loading) {
     return (
       <p>Now Loading...</p>
