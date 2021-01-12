@@ -12,6 +12,10 @@ opencv-python = "*"
 pyautogui = "*"
 scikit-image = "*"
 flask = "*"
+graphene = "*"
 
 [requires]
 python_version = "3.6"
+
+[scripts]
+devstart = "flask run"
