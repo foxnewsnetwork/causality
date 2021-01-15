@@ -13,6 +13,7 @@ pyautogui = "*"
 scikit-image = "*"
 flask = "*"
 graphene = "*"
+flask-uploads = "*"
 
 [requires]
 python_version = "3.6"
