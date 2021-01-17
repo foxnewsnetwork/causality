@@ -2,10 +2,16 @@ from typing import Dict
 from flask import Flask, request
 import os
 from causality.schema import schema
+from flask_uploads import IMAGES, UploadSet, configure_uploads
 
 
 def create_app(test_config=None):
     app = Flask(__name__, instance_relative_config=True)
+    app.config["UPLOADED_PHOTOS_DEST"] = "causality/data/img"
+    app.config["SECRET_KEY"] = os.urandom(24)
+
+    uploaded_photos = UploadSet('photos', IMAGES)
+    configure_uploads(app, uploaded_photos)
 
     @app.route('/api', methods=['POST'])
     def hello_world():
@@ -17,11 +23,9 @@ def create_app(test_config=None):
 
     @app.route('/image', methods=['POST'])
     def upload_image():
-        file = request.files['file']
-        data_dir = os.path.join(os.getcwd(), 'data')
-        list = os.listdir(data_dir)
-        number_files = len(list)
-        filename = os.path.join(data_dir, f'{number_files}.png')
-        file.save(filename)
-        return filename
+        if 'image' in request.files:
+            photo = request.files['image']
+            filename = uploaded_photos.save(photo)
+            return filename
+        return "failed to upload"
     return app
