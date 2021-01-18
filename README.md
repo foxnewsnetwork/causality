@@ -41,6 +41,12 @@ This project divides into two parts:
 Run the JS side via `yarn run start`
 Run the python side via `pipenv run devstart`
 
+If it's your first time, be sure to initialize the db with:
+
+```sh
+pipenv run init-db
+```
+
 ## Technical Project Management
 
 The [tpm](./tpm) directory contains documentation, plans, and other such things related to the management of this project itself. In addition, I will use github to track the project's backlog, releases, and progress.

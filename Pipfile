@@ -15,9 +15,12 @@ flask = "*"
 graphene = "*"
 werkzeug = "*"
 flask-reuploaded = "*"
+flask-sqlalchemy = "*"
+click = "*"
 
 [requires]
 python_version = "3.6"
 
 [scripts]
 devstart = "flask run"
+init-db = "flask init-db"

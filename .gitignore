@@ -26,4 +26,4 @@ yarn-error.log*
 
 # data saved from the server
 # no reason to have this in source ctrl
-/causality/data
+/data
