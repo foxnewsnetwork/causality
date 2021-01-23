@@ -24,3 +24,4 @@ python_version = "3.6"
 [scripts]
 devstart = "flask run"
 init-db = "flask init-db"
+migrate-db = "flask migrate-db"

@@ -8,6 +8,6 @@ class Image(db.Model):
     label = db.Column(db.String)
 
     training_set_id = db.Column(db.Integer, db.ForeignKey(
-        'training_set.id'), nullable=False)
+        'training_set.id'))
     training_set = db.relationship(
         TrainingSet, backref=db.backref('images', lazy=True))

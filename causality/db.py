@@ -13,6 +13,14 @@ def init_db():
     db.create_all()
 
 
+@click.command("migrate-db")
+@with_appcontext
+def migrate_db_command():
+    """Attempts to create all tables associated with existing orm tables without dropping data"""
+    db.create_all()
+    click.echo("Added tables.")
+
+
 @click.command("init-db")
 @with_appcontext
 def init_db_command():
@@ -31,4 +39,5 @@ def connect_db(get_app: Callable[[], Flask]) -> Callable[[], Flask]:
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     db.init_app(app)
     app.cli.add_command(init_db_command)
+    app.cli.add_command(migrate_db_command)
     return get_app

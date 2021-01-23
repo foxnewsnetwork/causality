@@ -11,7 +11,7 @@ def api_route(setup_route: Callable[[], Flask]) -> Callable[[], Flask]:
         data = request.get_json()
         result = schema.execute(
             data["query"],
-            variables=data["variables"]
+            **data
         )
         if result.errors:
             abort(500, result.errors)
