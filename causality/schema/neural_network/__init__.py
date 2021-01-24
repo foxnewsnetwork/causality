@@ -1,3 +1,4 @@
-from .create import *
-from .input import *
-from .object import *
+from .create import CreateNeuralNetwork
+from .input import InputNeuralNetwork
+from .object import NeuralNetwork
+from .data import NeuralNetworkData

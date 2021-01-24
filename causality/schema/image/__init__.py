@@ -1,3 +1,4 @@
-from .attach import *
-from .object import *
-from .label import *
+from .attach import AttachImageToTrainingSet
+from .object import Image
+from .label import LabelImage
+from .data import ImageData
