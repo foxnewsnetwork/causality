@@ -1,5 +1,5 @@
 import os
-from flask import Flask, request
+from flask import Flask, request, send_from_directory
 from flask_uploads import IMAGES, UploadSet, configure_uploads
 from typing import Callable
 from causality.orm.image import Image
@@ -25,5 +25,11 @@ def image_route(setup_route: Callable[[], Flask]) -> Callable[[], Flask]:
             db.session.commit()
             return f"{record.id}::{filename}"
         return "failed to upload"
+
+    @app.route('/image/<path:filename>', methods=['GET'])
+    def get_image(filename):
+        work_dir = os.path.join(
+            os.getcwd(), app.config['UPLOADED_PHOTOS_DEST'])
+        return send_from_directory(work_dir, filename)
 
     return setup_route
