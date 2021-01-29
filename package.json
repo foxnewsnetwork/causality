@@ -53,5 +53,5 @@
     "graphql-tag.macro": "^2.0.1",
     "patch-package": "^6.2.2"
   },
-  "proxy": "http://localhost:5555/"
+  "proxy": "http://localhost:5000/"
 }

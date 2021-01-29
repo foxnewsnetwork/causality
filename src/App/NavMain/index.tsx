@@ -9,11 +9,16 @@ import SandboxTensorFlow from 'App/SandboxTensorFlow';
 import ModelHub from 'App/ModelHub';
 import "./style.css";
 import SandboxApollo from 'App/SandboxApollo';
+import TrainingHub from 'App/TrainingHub';
 
 const NavMain = () => {
   return (
     <main className="nav-main">
       <Switch>
+        <Route path={Routes.TRAINING_HUB}>
+          <h2>Training Hub</h2>
+          <TrainingHub />
+        </Route>
         <Route path={Routes.SANDBOX_TENSORFLOW}>
           <h2>Tensor Flow</h2>
           <SandboxTensorFlow />

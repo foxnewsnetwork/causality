@@ -14,7 +14,7 @@ def api_route(setup_route: Callable[[], Flask]) -> Callable[[], Flask]:
             **data
         )
         if result.errors:
-            abort(500, result.errors)
-        return jsonify(result.data)
+            return jsonify(dict(data=result.data, errors=result.errors))
+        return jsonify(dict(data=result.data))
 
     return setup_route

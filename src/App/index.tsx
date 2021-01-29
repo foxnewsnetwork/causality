@@ -8,7 +8,10 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
+        />
         <BrowserRouter>
           <NavHeader />
           <CausalityDataProvider>
