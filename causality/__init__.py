@@ -1,6 +1,7 @@
 from flask import Flask
 from causality.routes.api import api_route
 from causality.routes.image import image_route
+from causality.routes.session import session_route
 from .db import connect_db
 
 
@@ -10,6 +11,7 @@ def create_app(test_config=None):
     @connect_db
     @api_route
     @image_route
+    @session_route
     def setup_app():
         return app
     return app

@@ -2,6 +2,7 @@ import graphene
 from .neural_network import NeuralNetwork, NeuralNetworkData
 from .training_set import TrainingSet, TrainingSetData
 from .image import Image, ImageData
+from .session import Session, SessionData
 
 
 class Query(graphene.ObjectType):
@@ -32,3 +33,8 @@ class Query(graphene.ObjectType):
 
     def resolve_images(parent, info, id):
         return ImageData.list(training_set_id=id)
+
+    session = graphene.Field(Session)
+
+    def resolve_session(parent, info):
+        return SessionData.current()
