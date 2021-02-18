@@ -21,6 +21,7 @@ export default function TrainingSetList() {
   const {
     state,
     actions,
+    error,
   } = useAPI();
   const { url } = useRouteMatch();
 
@@ -51,14 +52,10 @@ export default function TrainingSetList() {
         </ListItemSecondaryAction>
       </ListItem>
     )
-  }, [url])
+  }, [url, state.activeTrainingSet?.id])
 
-  if (state.loading) {
-    return <p>Now Loading...</p>
-  }
-
-  if (state.error) {
-    return <p>{JSON.stringify({ name: state.error.name, message: state.error.message })}</p>
+  if (error) {
+    return <p>{JSON.stringify({ name: error.name, message: error.message })}</p>
   }
 
   return (

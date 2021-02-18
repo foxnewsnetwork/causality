@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useMutation, useQuery } from '@apollo/client';
 import { ListTrainingSets } from 'data/queries/ListTrainingSets';
 import type { ListTrainingSetResponse } from 'data/queries/ListTrainingSets';
@@ -7,44 +7,69 @@ import type { CurrentTrainingSetResponse } from 'data/queries/CurrentTrainingSet
 import { ActivateTrainingSet } from 'data/mutations/ActivateTrainingSet';
 import type { ActivateTrainingSetParams, ActivateTrainingSetResponse } from 'data/mutations/ActivateTrainingSet';
 
+interface TrainingSetListState {
+  trainingSets: ListTrainingSetResponse['trainingSets'];
+  activeTrainingSet?: CurrentTrainingSetResponse['session']['trainingSet'];
+  isLoadingTrainingSet: boolean;
+  isLoadingActiveTrainingSet: boolean;
+  isLoadingActivate: boolean;
+  errorActivate?: Error;
+  errorTrainingSet?: Error;
+  errorActiveTrainingSet?: Error;
+}
+
 interface TrainingSetListAPI {
-  state: {
-    trainingSets: ListTrainingSetResponse['trainingSets'];
-    activeTrainingSet?: CurrentTrainingSetResponse['session']['trainingSet'];
-    loading: boolean;
-    error: Error;
-  };
+  state: TrainingSetListState;
   actions: {
     activateTrainingSet: (trainingSetId: string) => Promise<any>
   };
+  isLoading: boolean;
+  error?: Error;
+}
+
+function* product<A, B>(itA: Iterable<A>, itB: Iterable<B>) {
+  for (const a of itA) {
+    for (const b of itB) {
+      yield [a, b]
+    }
+  }
+}
+
+function* map<A, B>(it: Iterable<A>, fn: (a: A) => B) {
+  for (const i of it) {
+    yield fn(i)
+  }
+}
+
+function allKeysOf(objs: Array<any>, keys: Array<string>): Array<any> {
+  return [...map(product(objs, keys), ([obj, key]) => obj[key])]
 }
 
 export default function useTrainingSetListAPI(): TrainingSetListAPI {
   const listQ = useQuery<ListTrainingSetResponse>(ListTrainingSets)
   const [
     activateTrainingSet,
+    activeM,
   ] = useMutation<ActivateTrainingSetResponse, ActivateTrainingSetParams>(ActivateTrainingSet)
-  const sessionQ = useQuery<CurrentTrainingSetResponse>(CurrentTrainingSet)
+  const sessionQ = useQuery<CurrentTrainingSetResponse>(CurrentTrainingSet, {
+    variables: {}
+  })
 
-  const state = useMemo(() => {
-    let trainingSets = [];
-    if (!listQ.loading && !listQ.error) {
-      trainingSets = listQ.data.trainingSets
-    }
-    let activeTrainingSet;
-    if (!sessionQ.loading && !sessionQ.error) {
-      activeTrainingSet = sessionQ.data.session?.trainingSet
-    }
+  const state: TrainingSetListState = useMemo(() => {
     return {
-      trainingSets,
-      loading: listQ.loading || sessionQ.loading,
-      error: listQ.error || sessionQ.error,
-      activeTrainingSet,
-    };
-  }, [listQ.loading, sessionQ.loading])
+      isLoadingActivate: activeM.loading,
+      errorActivate: activeM.error,
+      isLoadingTrainingSet: listQ.loading,
+      isLoadingActiveTrainingSet: sessionQ.loading,
+      errorLoadingTrainingSet: listQ.error,
+      errorActiveTrainingSet: sessionQ.error,
+      activeTrainingSet: sessionQ.data?.session?.trainingSet,
+      trainingSets: listQ.data?.trainingSets ?? [],
+    }
+  }, allKeysOf([listQ, sessionQ, activeM], ['loading', 'error', 'data']))
 
   const actions = useMemo(() => ({
-    async activateTrainingSet(trainingSet: string) {
+    activateTrainingSet: async (trainingSet: string) => {
       await activateTrainingSet({
         variables: { trainingSet }
       })
@@ -52,5 +77,18 @@ export default function useTrainingSetListAPI(): TrainingSetListAPI {
     }
   }), [activateTrainingSet, sessionQ])
 
-  return { state, actions }
+  return {
+    state,
+    actions,
+    get isLoading() {
+      return state.isLoadingActivate ||
+        state.isLoadingActiveTrainingSet ||
+        state.isLoadingTrainingSet;
+    },
+    get error() {
+      return state.errorActivate ??
+        state.errorActiveTrainingSet ??
+        state.errorTrainingSet
+    },
+  }
 }
