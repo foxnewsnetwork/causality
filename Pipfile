@@ -18,6 +18,8 @@ flask-reuploaded = "*"
 flask-sqlalchemy = "*"
 click = "*"
 flask-session = "*"
+importlib-metadata = "1.4"
+di-engine = "*"
 
 [requires]
 python_version = "3.6"

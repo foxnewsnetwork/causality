@@ -11,6 +11,7 @@ TODO: properly setup, release, and put in badges
 ## Getting Started
 
 Prerequistes:
+
 - node
 - yarn
 - python 3.6.x
@@ -23,6 +24,18 @@ Run the following to setup:
 
 TODO: put together javascript bootstrap script
 TODO: put in a better docs
+
+Install [pipenv](https://github.com/pypa/pipenv)
+
+```sh
+pipenv install
+```
+
+To add a new dependency
+
+```sh
+pipenv intall newpackage
+```
 
 ## Structure of the Project
 
